@@ -96,7 +96,7 @@ if __name__=="__main__":
 
 
     taxcalc_dict=calculatetax(all_trades, all_positions, CGTCalc=CGTCalc, reportfile="TaxReport.txt",
-                              reportinglevel="VERBOSE", fxsource="FIXED")
+                              reportinglevel="VERBOSE", fxsource="CSV")
 
 
 

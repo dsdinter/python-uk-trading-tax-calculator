@@ -28,7 +28,7 @@ TRADES_LOC and POSITIONS_LOC indicate where in the trade and activity report res
 
 
 ASSETS=['Stocks', 'Futures', 'Forex']
-CURRENCIES=['GBP', 'JPY' ,'EUR', 'KRW', 'AUD', 'CHF', 'USD']
+CURRENCIES=['GBP', 'JPY' ,'EUR', 'KRW', 'AUD', 'CHF', 'USD', 'HKD']
 
 TRADES_LOC=1
 POSITIONS_LOC=7
@@ -38,6 +38,7 @@ POSITIONS_LOC=7
 ## Imports
 
 import datetime
+import sys
 
 import pandas as pd
 from BeautifulSoup import BeautifulSoup
@@ -257,6 +258,7 @@ def _parse_pandas_df(main_table, colref="Acct ID"):
                 ## It's a currency.
                 current_currency=indexentry
             else:
+                print "This is weird %s" % indexentry
                 raise Exception("Unrecognised header")
 
         else:
@@ -294,7 +296,9 @@ def _collapse_recursive_dict(df_results):
         currencies=df_subresults.keys()
 
         for ccy in currencies:
+            print "ccy %s" % ccy
             df_subsub=df_subresults[ccy]
+            print df_subsub
             if df_subsub is None:
                 ## Empty dict. It happens
                 continue
@@ -416,10 +420,14 @@ def get_ib_trades(fname):
     print "Getting trades from %s" % fname
     main_table=_read_ib_html(fname, table_ref=TRADES_LOC)
 
+    print main_table
+    # sys.exit(0)
     ## Convert to a recursive dict of dicts, whilst doing some cleaning
+    # TODO(kmh) Fix after here.
     df_results=_parse_pandas_df(main_table)
 
     ## Go back to a single data frame with extra columns added
+    print df_results
     all_results=_collapse_recursive_dict(df_results)
 
     ## Finally convert to a list of trades

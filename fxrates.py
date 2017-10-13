@@ -31,6 +31,8 @@ def FXDict(all_currencies, source):
         fx_dict=dict([(currency, get_fx_data(currency)) for currency in all_currencies])
     elif source=="FIXED":
         fx_dict=dict([(currency, get_fixed_fx_data(currency)) for currency in all_currencies])
+    elif source=="CSV":
+        fx_dict=dict([(currency, get_csv_data(currency)) for currency in all_currencies])
     # elif source=="QUANDL":
         # fx_dict=dict([(currency, get_quandl_currency(currency)) for currency in all_currencies])
 
@@ -56,4 +58,15 @@ def get_fixed_fx_data(currency):
     print "Warning using approximate rate of %f for %s" % (rate_value, currency)
 
     return pd.Series([rate_value], index=[pd.datetime(2008,1,1)])
+
+def get_csv_data(currency):
+  """
+  Read a CSV of format "date,currency"
+  """
+  currency = currency.upper()
+  print "Currency: %s" % currency
+  x = pd.read_csv("data/%s.csv"%currency, header=None, parse_dates=True,
+      squeeze=True, skiprows=1, index_col=0, dayfirst=True)
+  y = pd.Series(dict(x))
+  return 1/y
 
