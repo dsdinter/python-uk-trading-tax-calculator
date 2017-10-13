@@ -20,8 +20,9 @@ HEADER_NAMES indicates the asset classes which are specified in the table.
 
 CURRENCIES contains all the currencies that you trade.
 
-TRADES_LOC and POSITIONS_LOC indicate where in the trade and activity report respectively the
-  tables of trades and current positions are held. They shouldn't
+TRADES_LOC and POSITIONS_LOC indicate where in the trade and activity report
+  respectively the tables of trades and current positions are held. They
+  shouldn't change too frequently.
 """
 
 ## Start of formatting globals
@@ -29,9 +30,6 @@ TRADES_LOC and POSITIONS_LOC indicate where in the trade and activity report res
 
 ASSETS=['Stocks', 'Futures', 'Forex']
 CURRENCIES=['GBP', 'JPY' ,'EUR', 'KRW', 'AUD', 'CHF', 'USD', 'HKD']
-
-TRADES_LOC=1
-POSITIONS_LOC=7
 
 ## End of formatting globals
 
@@ -82,6 +80,8 @@ def _parse_html_table(rows):
                 ##consistently use notional value
 
                 headerlist=["Notional Value" if x=="Proceeds" else x for x in headerlist]
+                headerlist=["Tax" if x=="Fee" else x for x in headerlist]
+                headerlist=["Trade Date" if x=="Trade Date/Time" else x for x in headerlist]
                 headerrow=headerlist
 
         table_data = row.findAll('td')
@@ -140,7 +140,7 @@ def _check_ignore_row(row, colref="Acct ID"):
         """
         return True
 
-    if not row['Class']=='summaryRow':
+    if not (row['Class']=='summaryRow' or row['Class']=='row-summary'):
         """
         It's Granualar detail, can ignore
         """
@@ -244,7 +244,7 @@ def _parse_pandas_df(main_table, colref="Acct ID"):
             continue
 
         if _check_index_row(row, colref):
-            ## It's an index row, i.e. it contains eithier an asset class or a currency
+            ## It's an index row, i.e. it contains either an asset class or a currency
             ## Return the name of the index (asset class or currency
             indexentry=_get_index_row(row, colref)
 
@@ -296,9 +296,7 @@ def _collapse_recursive_dict(df_results):
         currencies=df_subresults.keys()
 
         for ccy in currencies:
-            print "ccy %s" % ccy
             df_subsub=df_subresults[ccy]
-            print df_subsub
             if df_subsub is None:
                 ## Empty dict. It happens
                 continue
@@ -404,7 +402,7 @@ def _from_pddf_to_trades_object(all_results):
 
 
 
-def get_ib_trades(fname):
+def get_ib_trades(fname, trades_loc=1):
     """
     Reads an .html file output by interactive brokers
     Returns a trade_list object
@@ -418,38 +416,35 @@ def get_ib_trades(fname):
     """
 
     print "Getting trades from %s" % fname
-    main_table=_read_ib_html(fname, table_ref=TRADES_LOC)
+    main_table=_read_ib_html(fname, table_ref=trades_loc)
 
-    print main_table
-    # sys.exit(0)
     ## Convert to a recursive dict of dicts, whilst doing some cleaning
-    # TODO(kmh) Fix after here.
     df_results=_parse_pandas_df(main_table)
 
     ## Go back to a single data frame with extra columns added
-    print df_results
     all_results=_collapse_recursive_dict(df_results)
 
     ## Finally convert to a list of trades
     return _from_pddf_to_trades_object(all_results)
 
 
-def get_ib_positions(fname):
+def get_ib_positions(fname, positions_loc=12):
     """
     Reads an .html file output by interactive brokers to get positions
     These are used to check consistency with trades
+    positions_loc is 7 for old html files, 12 for more recent ones from IB.
     Returns a positionList object
 
     To get the file log in to Account manager... Reports.... activity report....
 
     Save the resulting report as positions.html (or whatever)
 
-    Make sure the position report is run up to the same point as you
+    Make sure the position report is run up to the same point as your trades
 
     """
 
     print "Getting positions from %s" % fname
-    main_table=_read_ib_html(fname, table_ref=POSITIONS_LOC)
+    main_table=_read_ib_html(fname, table_ref=positions_loc)
 
     print "Processing positions"
     ## Convert to a recursive dict of dicts, whilst doing some cleaning
@@ -460,5 +455,3 @@ def get_ib_positions(fname):
 
     ## Finally convert to a list of positions
     return _from_pddf_to_positions_object(all_results)
-
-

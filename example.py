@@ -59,8 +59,8 @@ def get_all_trades_and_positions():
     To get the file log in to Account manager... Reports.... activity report....
     Save as .html
     """
-    positions1=get_ib_positions('positions1.html')
-    positions2=get_ib_positions('positions2.html')
+    positions1=get_ib_positions('positions1.html', 7)
+    positions2=get_ib_positions('positions2.html', 7)
 
     """
     You can join together as many of these as you like
