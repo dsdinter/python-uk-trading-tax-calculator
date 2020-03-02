@@ -28,8 +28,8 @@ TRADES_LOC and POSITIONS_LOC indicate where in the trade and activity report
 ## Start of formatting globals
 
 
-ASSETS=['Stocks', 'Futures', 'Forex']
-CURRENCIES=['GBP', 'JPY' ,'EUR', 'KRW', 'AUD', 'CHF', 'USD', 'HKD']
+ASSETS=['Stocks', 'Futures', 'Forex', 'CFD', 'Equity and Index Options', 'Warrants']
+CURRENCIES=['GBP', 'JPY' ,'EUR', 'KRW', 'AUD', 'CHF', 'USD', 'HKD', 'SEK', 'CAD']
 
 ## End of formatting globals
 

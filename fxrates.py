@@ -41,7 +41,7 @@ def FXDict(all_currencies, source):
 
     return fx_dict
 
-RATE_DICT=dict(GBP=1.0, USD=0.60, KRW=0.00078, JPY=0.0038, EUR=0.66, CHF=0.66, AUD=0.55)
+RATE_DICT=dict(GBP=1.0, USD=0.78, KRW=0.00078, JPY=0.0038, EUR=0.88, CHF=0.66, AUD=0.55, SEK=0.08, CAD=0.59)
 
 def get_fixed_fx_data(currency):
     """
