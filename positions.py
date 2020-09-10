@@ -105,7 +105,7 @@ def compare_position_dicts(dict1, dict2):
 
     codes1=dict1.keys()
     codes2=dict2.keys()
-    joint_codes=list(set(codes1+codes2))
+    joint_codes=list(set(list(codes1)+list(codes2)))
 
     pos1=[dict1.get(code,0) for code in joint_codes]
     pos2=[dict2.get(code,0) for code in joint_codes]

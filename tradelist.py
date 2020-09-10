@@ -163,10 +163,10 @@ class TradeList(list):
         if all(existing_ids_exist):
             existing_ids=[trade.TradeID for trade in self]
             if not any_duplicates(existing_ids):
-                print "All trades have ID's - not renumbering"
+                print("All trades have ID's - not renumbering")
                 return None
             else:
-                print "All trades have ID's but duplicates! *** renumbering"
+                print("All trades have ID's but duplicates! *** renumbering")
 
         self.timestampsort()
         [self[idx].modify(TradeID=str(idx)) for idx in range(len(self))]
@@ -249,7 +249,7 @@ class TradeList(list):
         listdatetimes=[trade.Date for trade in self]
         listdates=[x.date() for x in listdatetimes]
 
-        tradedate30daysafter=trade.Date.date()+datetime.timedelta(30)
+        tradedate30daysafter=tradetomatch.Date.date()+datetime.timedelta(30)
         listsignquant=[trade.SignQuantity for trade in self]
 
 
@@ -488,7 +488,7 @@ class TradeDictByCode(dict):
 
 
     def final_positions_as_dict(self):
-        final_positions=dict([(code, self[code].final_position()) for code in self.keys()])
+        final_positions=dict([(code, self[code].final_position()) for code in list(self.keys())])
         return final_positions
 
     def as_joint_list(self):
@@ -499,7 +499,7 @@ class TradeDictByCode(dict):
         Add the 'tradetype', 'pseudotrade', 'sharedtrade' labels to each trade, in each
         element of the code dict.
         """
-        [x._add_cumulative_data() for x in self.values()]
+        [x._add_cumulative_data() for x in list(self.values())]
         return self
 
     def generate_pseduo_trades(self):
@@ -507,7 +507,7 @@ class TradeDictByCode(dict):
         Removes trades with type 'OverClose' and generates two orders in place
         """
 
-        [x._spawn_pseudo_trades() for x in self.values()]
+        [x._spawn_pseudo_trades() for x in list(self.values())]
         return self
 
 class TradeDictByFX(dict):
@@ -521,7 +521,7 @@ class TradeDictByFX(dict):
         """
         Add fx rates, given a dictionary of FX rates
         """
-        for ccy in self.keys():
+        for ccy in list(self.keys()):
             fxmat=fx_dict[ccy]
             self[ccy]._add_onefx_rate(fxmat)
 
@@ -538,7 +538,7 @@ def from_tradedict_to_list(tradedict):
     Returns the dict joined together into one giant list
     """
 
-    all_keys=tradedict.keys()
+    all_keys=list(tradedict.keys())
     results=[[x for x in tradedict[key]] for key in all_keys]
     results=sum(results, [])
     results=TradeList(results)

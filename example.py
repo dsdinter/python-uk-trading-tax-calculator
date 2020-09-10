@@ -39,7 +39,7 @@ def get_all_trades_and_positions():
     """
 
     trades1=get_ib_trades("2019_tradeconfirms.html")
-    trades2=get_ib_trades("2020_tradeconfirms.html")
+    # trades2=get_ib_trades("2020_tradeconfirms.html")
 
     """
     You can also use .csv files to store trades. I'm doing that here to account for positions I
@@ -49,7 +49,7 @@ def get_all_trades_and_positions():
     ## trades3=read_generic_csv("tradespre2014.csv")
 
     ## Doesn't inherit the type
-    all_trades=TradeList(trades1+trades2)
+    all_trades=TradeList(trades1) # +trades2)
 
     """
     Get positions, from IB files.
@@ -107,7 +107,7 @@ if __name__=="__main__":
     taxcalc_dict.display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="NORMAL")
 
     ## Display all the trades for one code ('element')
-    taxcalc_dict['ENPH'].display_taxes_for_code(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
+    # taxcalc_dict['ENPH'].display_taxes_for_code(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
 
     ## Display a particular trade. The number '3' is as shown the report
     ##taxcalc_dict['FBTP DEC 14'].matched[3].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
@@ -122,9 +122,9 @@ if __name__=="__main__":
     profit_analyser(profits)
 
     avgcomm=taxcalc_dict.average_commission(2020)
-    codes=avgcomm.keys()
+    codes=list(avgcomm.keys())
     codes.sort()
     for code in codes:
-        print "%s %f" % (code, avgcomm[code])
+        print("%s %f" % (code, avgcomm[code]))
 
-    print np.nanmean(avgcomm.values())
+    print(np.nanmean(list(avgcomm.values())))

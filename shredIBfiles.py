@@ -39,7 +39,7 @@ import datetime
 import sys
 
 import pandas as pd
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 
 from trades import Trade
 from tradelist import TradeList
@@ -140,12 +140,12 @@ def _check_ignore_row(row, colref="Acct ID"):
         """
         return True
 
-    if not (row['Class']=='summaryRow' or row['Class']=='row-summary'):
+    if not (row['Class']=='summaryRow' or row['Class']=='row-summary' or 'row-summary' in row['Class']):        
         """
         It's Granualar detail, can ignore
         """
         return True
-
+    
     return False
 
 def _select_and_clean_pd_dataframe(main_table, selection_idx, colref="Acct ID"):
@@ -161,6 +161,7 @@ def _select_and_clean_pd_dataframe(main_table, selection_idx, colref="Acct ID"):
     dirty_rows=[rowidx for rowidx in range(len(pd_df.index)) if
         _check_ignore_row(pd_df.iloc[rowidx], colref)]
     pd_df=pd_df.drop(pd_df.index[dirty_rows])
+
 
     if len(pd_df.index)==0:
         return None
@@ -258,7 +259,7 @@ def _parse_pandas_df(main_table, colref="Acct ID"):
                 ## It's a currency.
                 current_currency=indexentry
             else:
-                print "This is weird %s" % indexentry
+                print("This is weird %s" % indexentry)
                 raise Exception("Unrecognised header")
 
         else:
@@ -289,11 +290,11 @@ def _collapse_recursive_dict(df_results):
     """
 
     all_results=[]
-    assets=df_results.keys()
+    assets=list(df_results.keys())
 
     for assetname in assets:
         df_subresults=df_results[assetname]
-        currencies=df_subresults.keys()
+        currencies=list(df_subresults.keys())
 
         for ccy in currencies:
             df_subsub=df_subresults[ccy]
@@ -331,19 +332,17 @@ def _read_ib_html(fname, table_ref):
 
     ## Open the file
     with open(fname,'r') as file_handle:
-        soup = BeautifulSoup(file_handle.read())
+        soup = BeautifulSoup(file_handle.read(), features="html.parser")
     if len(soup)==0:
         raise Exception("Empty or non existent html file %s" % fname)
 
     ## Find the right table and extract the rows
-    tables=soup.findAll('table')
+    tables=soup.find_all('table')
     table=tables[table_ref]
-    table_rows = table.findAll('tr')
+    table_rows = table.find_all('tr')
 
     ## Process the rows from html into lists
     (headerrow, table_data) = _parse_html_table(table_rows)
-
-    soup.close()
 
     ## Convert to pandas dataframe
     main_table=_html_table_to_pddataframe(headerrow, table_data)
@@ -415,7 +414,7 @@ def get_ib_trades(fname, trades_loc=1):
 
     """
 
-    print "Getting trades from %s" % fname
+    print("Getting trades from %s" % fname)
     main_table=_read_ib_html(fname, table_ref=trades_loc)
 
     ## Convert to a recursive dict of dicts, whilst doing some cleaning
@@ -443,10 +442,10 @@ def get_ib_positions(fname, positions_loc=12):
 
     """
 
-    print "Getting positions from %s" % fname
+    print("Getting positions from %s" % fname)
     main_table=_read_ib_html(fname, table_ref=positions_loc)
 
-    print "Processing positions"
+    print("Processing positions")
     ## Convert to a recursive dict of dicts, whilst doing some cleaning
     df_results=_parse_pandas_df(main_table, "Symbol")
 

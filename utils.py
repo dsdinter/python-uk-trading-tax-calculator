@@ -162,8 +162,11 @@ def pretty(x, commas=True):
     """
     Return a string of x formatted nicely
     """
+    if not type(x) is float:
+        print(x)
+        print(type(x))
 
-    assert type(x) is float
+    assert type(x) is float or type(x) is int
 
     if x==0.0:
         return "0"
@@ -217,21 +220,21 @@ def profit_analyser(profits):
     ## Do some rudimentary analysis of profits
 
     biglist=[]
-    for code in profits.keys():
+    for code in list(profits.keys()):
         biglist=biglist+profits[code]
 
-    codes=profits.keys()
+    codes=list(profits.keys())
     profits_by_code=[sum(profits[code]) for code in codes]
     profits_by_code=pd.DataFrame(dict(code=codes, profit=profits_by_code))
 
     profits=[x for x in biglist if x>0]
     losses=[x for x in biglist if x<0]
 
-    print "%d Trades Profits %d Losses %s" % (len(biglist), len(profits),len(losses))
-    print "Average profit %f Average loss %f"  % (np.mean(profits), np.mean(losses))
+    print("%d Trades Profits %d Losses %s" % (len(biglist), len(profits),len(losses)))
+    print("Average profit %f Average loss %f"  % (np.mean(profits), np.mean(losses)))
 
     profits_by_code=profits_by_code.sort_values("profit")
 
-    print "Total profits"
-    print profits_by_code
+    print("Total profits")
+    print(profits_by_code)
 

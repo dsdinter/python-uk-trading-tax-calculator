@@ -37,26 +37,26 @@ class TaxCalcDict(dict):
         '''
         assert type(tradedict) is TradeDictByCode
 
-        for code in tradedict.keys():
+        for code in list(tradedict.keys()):
             self[code]=TaxCalcElement(tradedict[code])
 
     def allocate_dict_trades(self, CGTcalc=True):
 
-        [taxelement.allocate_trades(CGTcalc) for taxelement in self.values()]
+        [taxelement.allocate_trades(CGTcalc) for taxelement in list(self.values())]
 
         return self
 
 
     def return_profits(self, taxyear, CGTCalc):
 
-        codes= self.keys()
+        codes= list(self.keys())
         codes.sort()
         elements_profits=dict([(code,self[code].return_profits_for_code(taxyear, CGTCalc)) for code in codes])
 
         return elements_profits
 
     def average_commission(self, taxyear):
-        codes= self.keys()
+        codes= list(self.keys())
         codes.sort()
         average_commissions=dict([(code,self[code].average_commission(taxyear)) for code in codes])
 
@@ -78,7 +78,7 @@ class TaxCalcDict(dict):
         ## Prints, and returns a tuple for each disposal_proceeds, allowable_costs, year_gains, year_losses,
         ##        number_disposals, commissions, taxes, gross profit, net profit
 
-        codes= self.keys()
+        codes= list(self.keys())
         codes.sort()
         elements_taxdata=[self[code].display_taxes_for_code(taxyear, CGTCalc, reportinglevel, report) for code in codes]
 
@@ -91,7 +91,7 @@ class TaxCalcDict(dict):
             return None
 
 
-        summary_taxdata=map(sum, zip(*elements_taxdata))
+        summary_taxdata=list(map(sum, list(zip(*elements_taxdata))))
 
         assert len(summary_taxdata)==len(zero_tax_tuple)
 
@@ -106,7 +106,7 @@ class TaxCalcDict(dict):
     def tax_year_span(self):
         ## Get unique list of tax years
         datelist=[]
-        for taxelement in self.values():
+        for taxelement in list(self.values()):
             datelist=datelist+taxelement.closing_trade_dates()
         taxyears=[which_tax_year(datex) for datex in datelist]
         taxyears=list(set(taxyears))
@@ -120,7 +120,7 @@ class TaxCalcDict(dict):
         """
         result=PositionList()
 
-        for code in self.keys():
+        for code in list(self.keys()):
             position=self[code].unmatched.final_position()
             result.append(Position(Code=code, Position=position))
 
@@ -159,7 +159,7 @@ class TaxCalcElement(object):
 
     def code(self):
         if len(self.matched)>0:
-            return self.matched.values()[0].closingtrade.Code
+            return list(self.matched.values())[0].closingtrade.Code
         elif len(self.unmatched)>0:
             return self.unmatched[0].Code
         else:
@@ -167,7 +167,7 @@ class TaxCalcElement(object):
 
 
     def closing_trade_dates(self):
-        datelist=[taxcalcgroup.closingtrade.Date for taxcalcgroup in self.matched.values()]
+        datelist=[taxcalcgroup.closingtrade.Date for taxcalcgroup in list(self.matched.values())]
 
         return datelist
 
@@ -292,8 +292,8 @@ class TaxCalcElement(object):
 
 
         if taxcalcgroup.is_unmatched():
-            print "Can't find a match for %d lots of ...:" % taxcalcgroup.count_unmatched()
-            print taxcalcgroup.closingtrade
+            print("Can't find a match for %d lots of ...:" % taxcalcgroup.count_unmatched())
+            print(taxcalcgroup.closingtrade)
             raise Exception()
 
 
@@ -302,7 +302,7 @@ class TaxCalcElement(object):
 
     def return_profits_for_code(self, taxyear, CGTCalc):
         ## Returns a list of profits
-        groupidlist=self.matched.keys()
+        groupidlist=list(self.matched.keys())
         groupidlist.sort()
 
         ## Last is always net p&l
@@ -315,7 +315,7 @@ class TaxCalcElement(object):
         ## Prints, and returns a tuple for each disposal_proceeds, allowable_costs, year_gains, year_losses,
         ##        number_disposals, commissions, taxes, gross profit, net profit
 
-        groupidlist=self.matched.keys()
+        groupidlist=list(self.matched.keys())
         groupidlist.sort()
 
         taxdata=[self.matched[groupid].group_display_taxes(taxyear, CGTCalc, reportinglevel, groupid, report) for groupid in groupidlist]
@@ -323,7 +323,7 @@ class TaxCalcElement(object):
             return zero_tax_tuple
 
         ## Sum up the tuple, and return the sums
-        sum_taxdata=map(sum, zip(*taxdata))
+        sum_taxdata=list(map(sum, list(zip(*taxdata))))
 
         assert len(sum_taxdata)==len(zero_tax_tuple)
 
@@ -331,7 +331,7 @@ class TaxCalcElement(object):
 
     def average_commission(self, taxyear):
         ## Returns the average commission
-        groupidlist=self.matched.keys()
+        groupidlist=list(self.matched.keys())
         groupidlist.sort()
 
         ## Last is always net p&l

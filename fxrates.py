@@ -27,7 +27,7 @@ def FXDict(all_currencies, source):
 
 
     if source=="DATABASE":
-        print "WARNING WILL BLOW UP IF YOU HAVEN'T SET UP A DATABASE"
+        print("WARNING WILL BLOW UP IF YOU HAVEN'T SET UP A DATABASE")
         fx_dict=dict([(currency, get_fx_data(currency)) for currency in all_currencies])
     elif source=="FIXED":
         fx_dict=dict([(currency, get_fixed_fx_data(currency)) for currency in all_currencies])
@@ -55,7 +55,7 @@ def get_fixed_fx_data(currency):
 
     rate_value=RATE_DICT[currency]
 
-    print "Warning using approximate rate of %f for %s" % (rate_value, currency)
+    print("Warning using approximate rate of %f for %s" % (rate_value, currency))
 
     return pd.Series([rate_value], index=[pd.datetime(2008,1,1)])
 
@@ -64,7 +64,7 @@ def get_csv_data(currency):
   Read a CSV of format "date,currency"
   """
   currency = currency.upper()
-  print "Currency: %s" % currency
+  print("Currency: %s" % currency)
   x = pd.read_csv("data/%s.csv"%currency, header=None, parse_dates=True,
       squeeze=True, skiprows=1, index_col=0, dayfirst=True)
   y = pd.Series(dict(x))

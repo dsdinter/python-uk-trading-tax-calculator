@@ -45,22 +45,22 @@ def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, 
     else:
         report = open(reportfile, "w")
 
-    print "Report will be written to %s" % reportfile
+    print("Report will be written to %s" % reportfile)
 
     ### Check against positions
     if all_positions is not None:
         breaklist=compare_trades_and_positions(all_trades, all_positions)
         if len(breaklist)>0:
-            print "Breaks. Should be none except perhaps for FX rates."
-            print breaklist
+            print("Breaks. Should be none except perhaps for FX rates.")
+            print(breaklist)
         else:
-            print "Trades and positions consistent"
+            print("Trades and positions consistent")
 
     ### Add TradeID's
     all_trades.add_tradeids()
 
     ## Get FX data
-    print "Getting fx data"
+    print("Getting fx data")
     all_currencies=all_trades.all_currencies()
     fx_dict=FXDict(all_currencies, fxsource)
 
@@ -76,18 +76,18 @@ def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, 
     taxcalc_dict=TaxCalcDict(trade_dict_bycode)
 
     ## Do the trade matching
-    print "Matching trades"
+    print("Matching trades")
     taxcalc_dict.allocate_dict_trades(CGTCalc)
 
     ## Consistency check - this should never fail
     breaklist=compare_trades_and_positions(all_trades, taxcalc_dict.umatched_as_positions())
 
     if len(breaklist)>0:
-        print "BREAKS between final positions and those implied by trades. Something gone horribly wrong!"
-        print breaklist
+        print("BREAKS between final positions and those implied by trades. Something gone horribly wrong!")
+        print(breaklist)
         raise Exception("Breaks occured!")
     else:
-        print "Passed consistency check"
+        print("Passed consistency check")
 
     ## What tax years are our trades for
     taxyears=taxcalc_dict.tax_year_span()
@@ -102,6 +102,6 @@ def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, 
     if reportfile is not "the screen":
         report.close()
 
-    print "Report finished"
+    print("Report finished")
 
     return taxcalc_dict
