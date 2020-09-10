@@ -35,5 +35,26 @@
     See README.txt
 
 """
-    
-2) For instructions see 
+
+## Installation
+We use a Python venv and install dependencies first.
+
+```
+git clone [THIS-REPOSITORY]
+python -m venv python-tax-calculator-venv
+cd python-tax-calculator-venv/
+source bin/activate
+pip install beautifulsoup4
+pip install pandas
+pip install quandl
+cd ../python-uk-trading-tax-calculator
+```
+
+## Instructions
+
+In Interactive Brokers Account Management, go to Reports/Tax Docs > Activity.
+Then set Period to 'Fiscal Year', set Date to whichever year your're creating the report for, Format to 'HTML/Download'.
+Place the downloaded file in the program folder and name it `2019_tradeconfirms.html` (you can adjust the name in `example.py`).
+Run the file: `python example.py`
+
+This generates a file named `TaxReport.txt` which you can pass to HMRC in your tax return. 

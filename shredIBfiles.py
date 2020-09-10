@@ -427,7 +427,7 @@ def get_ib_trades(fname, trades_loc=1):
     return _from_pddf_to_trades_object(all_results)
 
 
-def get_ib_positions(fname, positions_loc=12):
+def get_ib_positions(fname, positions_loc=2):
     """
     Reads an .html file output by interactive brokers to get positions
     These are used to check consistency with trades
