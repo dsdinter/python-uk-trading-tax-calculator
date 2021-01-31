@@ -182,7 +182,7 @@ class TaxCalcTradeGroup(object):
                 gbp_allowable_costs = abs(close_value_gbp) - close_tax_gbp - close_comm_gbp
 
             
-        elif assetclass=="Futures" or assetclass=="Forex":
+        elif assetclass=="Futures" or assetclass=="Forex" or assetclass=="Equity and Index Options" or assetclass=="Warrants" or assetclass == 'CFD':
             ## Futures. Disposal proceeds is local profit converted at closing FX rate
             ## Allowable costs includes only commissions, taxes
             

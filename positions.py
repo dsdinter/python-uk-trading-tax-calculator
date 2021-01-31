@@ -1,11 +1,11 @@
 """
     Python UK trading tax calculator
-    
+
     Copyright (C) 2015  Robert Carver
-    
-    You may copy, modify and redistribute this file as allowed in the license agreement 
+
+    You may copy, modify and redistribute this file as allowed in the license agreement
          but you must retain this header
-    
+
     See README.txt
 
 """
@@ -21,7 +21,7 @@ class Position(object):
 
     def _possible_args(self):
         return self._required_columns()+self._optional_columns()
-    
+
     def _required_columns(self):
         return ['Code',  'Position']
 
@@ -33,13 +33,13 @@ class Position(object):
         arg_types=dict(Code=str,  Position=float)
         return arg_types
 
-    
+
     def __init__(self, **kwargs):
 
         '''
-        Constructor 
-        
-        
+        Constructor
+
+
         '''
 
         type_and_sense_check_arguments(self, kwargs)
@@ -51,22 +51,22 @@ class Position(object):
 
         setattr(self, 'argsused', argsused)
 
-    
+
     def modify(self, **kwargs):
 
         modpositions=type_and_sense_check_arguments(self, kwargs, checkrequired=False)
-        
+
         argsused=self.argsused
 
         for key in modpositions:
             setattr(self, key, modpositions[key])
             argsused.append(key)
-            
-        argsused=list(set(argsused))    
+
+        argsused=list(set(argsused))
         setattr(self, 'argsused', argsused)
 
-        
-            
+
+
     def __repr__(self):
         ans=", ".join(["%s:%s" % (name, str(getattr(self, name))) for name in self.argsused])
         return ans
@@ -75,8 +75,8 @@ class Position(object):
 class PositionList(list):
     '''
     A PositionList object is a list of positions
-    
-    
+
+
     '''
 
     def as_dict(self):
@@ -90,7 +90,7 @@ def list_breaks(dict1, dict2):
     """
     results=compare_position_dicts(dict1, dict2)
     ans=results[results.Break==True]
-    ans.sort("Code")
+    ans.sort_values("Code")
     return ans
 
 def not_matching_position(x, y):
@@ -102,28 +102,28 @@ def compare_position_dicts(dict1, dict2):
     """
     Compare two position dicts to see if any break
     """
-    
+
     codes1=dict1.keys()
     codes2=dict2.keys()
-    joint_codes=list(set(codes1+codes2))
-    
+    joint_codes=list(set(list(codes1)+list(codes2)))
+
     pos1=[dict1.get(code,0) for code in joint_codes]
     pos2=[dict2.get(code,0) for code in joint_codes]
     any_break=[not_matching_position(pos1[idx], pos2[idx]) for idx in range(len(joint_codes))]
 
     results=pd.DataFrame(dict(Code=joint_codes, Position1=pos1, Position2=pos2, Break=any_break))
-    
+
     return results
 
 def compare_trades_and_positions(all_trades, all_positions):
     """
     Compares the final positions imputed from a list of trades, and a list of positions.
-    
+
     Good sanity check
     """
 
     posdict1=all_trades.final_positions_as_dict()
     posdict2=all_positions.as_dict()
-    
+
     return list_breaks(posdict1, posdict2)
-    
+
