@@ -9,6 +9,7 @@
     See README.txt
 
 """
+import sys
 
 import numpy as np
 
@@ -20,7 +21,8 @@ from tradelist import TradeList
 from positions import PositionList
 from utils import profit_analyser
 
-def get_all_trades_and_positions():
+
+def get_all_trades_and_positions(trade_confirms_file, activity_report_file=None):
     """
     You can change this file for your own purposes
     """
@@ -38,7 +40,7 @@ def get_all_trades_and_positions():
     Here I'm loading reports from two IB accounts
     """
 
-    trades1=get_ib_trades("Tradeconfirms.htm")
+    trades1 = get_ib_trades(trade_confirms_file)
     # trades2=get_ib_trades("2020_tradeconfirms.html")
 
     """
@@ -49,7 +51,7 @@ def get_all_trades_and_positions():
     ## trades3=read_generic_csv("tradespre2014.csv")
 
     ## Doesn't inherit the type
-    all_trades=TradeList(trades1) # +trades2)
+    all_trades = TradeList(trades1)  # +trades2)
 
     """
     Get positions, from IB files.
@@ -59,21 +61,29 @@ def get_all_trades_and_positions():
     To get the file log in to Account manager... Reports.... activity report....
     Save as .html
     """
-    # positions1=get_ib_positions('2018_activity.html', 7)
-    # positions2=get_ib_positions()
+    if activity_report_file:
+        positions1 = get_ib_positions(activity_report_file, 7)
+        all_positions = PositionList(positions1)
+    else:
+        all_positions = PositionList()
 
-    """
-    You can join together as many of these as you like
-    """
-    all_positions=PositionList()
+
 
     return (all_trades, all_positions)
 
-if __name__=="__main__":
 
+if __name__ == "__main__":
 
-    ### Get trades and positions
-    (all_trades, all_positions)=get_all_trades_and_positions()
+    if len(sys.argv) == 3:  # sys.argv[0] is the script name, so we need 2 items
+        # Get trades and positions
+        (all_trades, all_positions) = get_all_trades_and_positions(trade_confirms_file=sys.argv[1],
+                                                                   activity_report_file=sys.argv[2])
+    elif len(sys.argv) == 2:
+        (all_trades, all_positions) = get_all_trades_and_positions(trade_confirms_file=sys.argv[1])
+    else:
+        print("This program requires exactly 2 arguments.Trades Confirmation file and positions file")
+        exit(1)
+
 
 
     """
@@ -93,24 +103,22 @@ if __name__=="__main__":
 
     ### Decide if we're calculating on a CGT or a 'true cost' basis
     CGTCalc = True
+    TAX_YEAR = 2025
     REPORT_FILE = "TaxReport.txt"
     REPORTING_LEVEL = "VERBOSE"
     FX_SOURCE = "YFINANCE"
     FX_FROM_DATE = "2024-01-30"
     FX_TO_DATE = "2024-05-04"
 
-
-    taxcalc_dict=calculatetax(all_trades, all_positions, CGTCalc=CGTCalc, reportfile=REPORT_FILE,
-                              reportinglevel=REPORTING_LEVEL, fxsource=FX_SOURCE, fx_from_date=FX_FROM_DATE,
-                              fx_to_date=FX_TO_DATE)
-
-
+    taxcalc_dict = calculatetax(all_trades, all_positions, CGTCalc=CGTCalc, reportfile=REPORT_FILE,
+                                reportinglevel=REPORTING_LEVEL, fxsource=FX_SOURCE, fx_from_date=FX_FROM_DATE,
+                                fx_to_date=FX_TO_DATE)
 
     ## Example of how we can delve into the finer details. This stuff is all printed to screen
     ## You can also run this interactively
     ## CGTCalc needs to match, or it wont' make sense
 
-    taxcalc_dict.display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="NORMAL")
+    taxcalc_dict.display_taxes(taxyear=TAX_YEAR, CGTCalc=CGTCalc, reportinglevel="NORMAL")
 
     ## Display all the trades for one code ('element')
     # taxcalc_dict['ENPH'].display_taxes_for_code(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
@@ -122,13 +130,12 @@ if __name__=="__main__":
     #taxcalc_dict['FGBS DEC 14'].element_display_taxes(taxyear=2015, CGTCalc=CGTCalc, reportinglevel="NORMAL")
     ##taxcalc_dict['FGBS DEC 14'].matched[17].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
 
-
     ## Bonus feature - analyse profits
-    profits=taxcalc_dict.return_profits(2020, CGTCalc)
+    profits = taxcalc_dict.return_profits(TAX_YEAR, CGTCalc)
     profit_analyser(profits)
 
-    avgcomm=taxcalc_dict.average_commission(2020)
-    codes=list(avgcomm.keys())
+    avgcomm = taxcalc_dict.average_commission(TAX_YEAR)
+    codes = list(avgcomm.keys())
     codes.sort()
     for code in codes:
         print("%s %f" % (code, avgcomm[code]))
