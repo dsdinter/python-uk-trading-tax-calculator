@@ -38,7 +38,7 @@ def get_all_trades_and_positions():
     Here I'm loading reports from two IB accounts
     """
 
-    trades1=get_ib_trades("2019_tradeconfirms.html")
+    trades1=get_ib_trades("Tradeconfirms.htm")
     # trades2=get_ib_trades("2020_tradeconfirms.html")
 
     """
@@ -92,11 +92,17 @@ if __name__=="__main__":
     """
 
     ### Decide if we're calculating on a CGT or a 'true cost' basis
-    CGTCalc=True
+    CGTCalc = True
+    REPORT_FILE = "TaxReport.txt"
+    REPORTING_LEVEL = "VERBOSE"
+    FX_SOURCE = "YFINANCE"
+    FX_FROM_DATE = "2024-01-30"
+    FX_TO_DATE = "2024-05-04"
 
 
-    taxcalc_dict=calculatetax(all_trades, all_positions, CGTCalc=CGTCalc, reportfile="TaxReport.txt",
-                              reportinglevel="VERBOSE", fxsource="FIXED")
+    taxcalc_dict=calculatetax(all_trades, all_positions, CGTCalc=CGTCalc, reportfile=REPORT_FILE,
+                              reportinglevel=REPORTING_LEVEL, fxsource=FX_SOURCE, fx_from_date=FX_FROM_DATE,
+                              fx_to_date=FX_TO_DATE)
 
 
 

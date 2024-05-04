@@ -13,11 +13,12 @@
 
 import sys
 from positions import compare_trades_and_positions
-from fxrates import FXDict
+from fxrates import generate_fx_dictionary
 from taxcalcdict import TaxCalcDict
 from utils import star_line
 
-def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, reportinglevel="NORMAL", fxsource="DATABASE"):
+def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, reportinglevel="NORMAL",
+                 fxsource="DATABASE", fx_from_date=None, fx_to_date=None):
     """
     Calculate the tax
 
@@ -50,7 +51,7 @@ def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, 
     ### Check against positions
     if all_positions is not None:
         breaklist=compare_trades_and_positions(all_trades, all_positions)
-        if len(breaklist)>0:
+        if len(breaklist) > 0:
             print("Breaks. Should be none except perhaps for FX rates.")
             print(breaklist)
         else:
@@ -61,14 +62,14 @@ def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, 
 
     ## Get FX data
     print("Getting fx data")
-    all_currencies=all_trades.all_currencies()
-    fx_dict=FXDict(all_currencies, fxsource)
+    all_currencies = all_trades.all_currencies()
+    fx_dict = generate_fx_dictionary(all_currencies, fxsource, fx_from_date, fx_to_date)
 
     all_trades.add_fxdict_rates(fx_dict)
 
 
     ## Do various preprocessing measures
-    trade_dict_bycode=all_trades.separatecode()
+    trade_dict_bycode = all_trades.separatecode()
     trade_dict_bycode.add_cumulative_data()
     trade_dict_bycode.generate_pseduo_trades()
 

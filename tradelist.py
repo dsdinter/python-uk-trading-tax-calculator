@@ -128,10 +128,15 @@ class TradeList(list):
         if not self.check_same_currency():
             raise Exception("You can't apply FX rate as different currencies in TradeList")
 
-        dataframe=self.as_dataframe().sort_values("Date")
-        fxmat=uniquets(fxmat)
-        fxmat=fxmat.reindex(dataframe.index, method="ffill")
-        [self[idx].modify(FXRate=float(fxmat[idx])) for idx in range(len(self))]
+        dataframe = self.as_dataframe().sort_index()
+        fxmat = uniquets(fxmat)
+        print("names")
+        #print(dataframe.dtypes)
+        #print(fxmat.dtypes)
+        fxmat.index = np.array(fxmat.index, dtype=np.datetime64)
+        print(fxmat.index)
+        fxmat = fxmat.reindex(dataframe.index, method="ffill")
+        [self[idx].modify(FXRate=float(fxmat.iloc[idx])) for idx in range(len(self))]
 
 
     def all_currencies(self):
