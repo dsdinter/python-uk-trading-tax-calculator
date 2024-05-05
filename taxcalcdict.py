@@ -321,8 +321,7 @@ class TaxCalcElement(object):
 
         # Last is always net p&l
         taxdata = [self.matched[groupid].group_display_taxes(taxyear, CGTCalc=True, reportinglevel="", groupid=groupid,
-                                                             report=None, display=False) \
-                   for groupid in groupidlist]
+                                                             report=None, display=False) for groupid in groupidlist]
 
         commissions = [x[5] for x in taxdata]
         quants = [x[8] for x in taxdata]
@@ -341,13 +340,10 @@ class TaxCalcElement(object):
 
 def display_summary_tax(summary_taxdata, CGTCalc, taxyear, report):
     """
-        taxdata contains a list of tuples
-        # Each tuplue (gbp_disposal_proceeds, gbp_allowable_costs, gbp_gains, gbp_losses, number_disposals,
-                commissions, taxes, gbp_gross_profit, gbp_net_profit)
-
-
-
-        """
+    taxdata contains a list of tuples
+    # Each tuplue (gbp_disposal_proceeds, gbp_allowable_costs, gbp_gains, gbp_losses, number_disposals,
+            commissions, taxes, gbp_gross_profit, gbp_net_profit)
+    """
 
     # Unpack tuple
     (gbp_disposal_proceeds, gbp_allowable_costs, gbp_gains, gbp_losses, number_disposals,
@@ -360,16 +356,18 @@ def display_summary_tax(summary_taxdata, CGTCalc, taxyear, report):
 
     if CGTCalc:
         report.write(
-            "Disposal Proceeds = %s, Allowable Costs = %s, Disposals = %d \n Year Gains = %s  Year Losses = %s PROFIT = %s\n" % \
+            "Disposal Proceeds = %s, Allowable Costs = %s, Disposals = %d \n Year Gains = %s  Year Losses = %s "
+            "PROFIT = %s\n" %
             (pretty(gbp_disposal_proceeds), pretty(gbp_allowable_costs),
              number_disposals, pretty(gbp_gains), pretty(gbp_losses), pretty(gbp_net_profit)))
 
     else:
-        report.write("Gross trading profit %s, Commission paid %s, Taxes paid %s, Net profit %s\n" % \
+        report.write("Gross trading profit %s, Commission paid %s, Taxes paid %s, Net profit %s\n" %
                      (pretty(gbp_gross_profit), pretty(gbp_commissions),
                       pretty(gbp_taxes), pretty(gbp_net_profit)))
 
         report.write(
-            "\nNot included: interest paid, interest received, data and other fees, internet connection,...\n hardware, software, books, subscriptions, office space, Dividend income (report seperately)\n\n")
+            "\nNot included: interest paid, interest received, data and other fees, internet connection,...\n "
+            "hardware, software, books, subscriptions, office space, Dividend income (report seperately)\n\n")
 
     report.write("\n\n")

@@ -16,12 +16,6 @@ from tradelist import TradeList
 
 """
 
-"""
-Import a generic csv
-
-
-"""
-
 
 def _resolveBS(xstring):
     if xstring == "B":
@@ -81,13 +75,13 @@ def read_generic_csv(fname, useassetclass="Stocks"):
 
     """
 
-    ## 'Read it in
+    # 'Read it in
     all_results = pd.read_csv(fname)
 
-    ## Convert to a list of trades
+    # Convert to a list of trades
     tradelist = _from_genericpdf_to_trades_object(all_results, useassetclass)
 
-    ## We need to add the values, and signed quantities, as these aren't included by default
+    # We need to add the values, and signed quantities, as these aren't included by default
     tradelist = tradelist.add_values()
 
     return tradelist

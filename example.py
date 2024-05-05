@@ -14,7 +14,6 @@ import sys
 import numpy as np
 
 from shredIBfiles import get_ib_trades, get_ib_positions
-from shredgenericcsv import read_generic_csv
 from calculatetax import calculatetax
 
 from tradelist import TradeList
@@ -119,11 +118,11 @@ if __name__ == "__main__":
     # taxcalc_dict['ENPH'].display_taxes_for_code(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
 
     # Display a particular trade. The number '3' is as shown the report
-    #taxcalc_dict['FBTP DEC 14'].matched[3].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
+    # taxcalc_dict['FBTP DEC 14'].matched[3].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
 
     # Heres a cool trade
-    #taxcalc_dict['FGBS DEC 14'].element_display_taxes(taxyear=2015, CGTCalc=CGTCalc, reportinglevel="NORMAL")
-    #taxcalc_dict['FGBS DEC 14'].matched[17].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
+    # taxcalc_dict['FGBS DEC 14'].element_display_taxes(taxyear=2015, CGTCalc=CGTCalc, reportinglevel="NORMAL")
+    # taxcalc_dict['FGBS DEC 14'].matched[17].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
 
     # Bonus feature - analyse profits
     profits = taxcalc_dict.return_profits(TAX_YEAR, CGTCalc)

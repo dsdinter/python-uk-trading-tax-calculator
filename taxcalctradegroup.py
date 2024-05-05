@@ -5,12 +5,12 @@ from utils import tax_year, star_line, pretty
 
 """
     Python UK trading tax calculator
-    
+
     Copyright (C) 2015  Robert Carver
-    
-    You may copy, modify and redistribute this file as allowed in the license agreement 
+
+    You may copy, modify and redistribute this file as allowed in the license agreement
          but you must retain this header
-    
+
     See README.txt
 
 """
@@ -20,21 +20,21 @@ zero_tax_tuple = (0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
 class TaxCalcTradeGroup(object):
     """
-    attributes: closingtrade, sameday, withinmonth, s104 
-            closingtrade - contains single trade 
+    attributes: closingtrade, sameday, withinmonth, s104
+            closingtrade - contains single trade
             sameday - TradeList of all matched trades done in the same day (if relevant)
             withinmonth - TradeList of all matched trades done in next 30 days (if relevant)
-            s104 - TradeList of all remaining matched trades 
+            s104 - TradeList of all remaining matched trades
     """
 
     def __init__(self, closingtrade):
 
         '''
-        We'd normally set up the group with a single closing trade 
+        We'd normally set up the group with a single closing trade
         '''
 
         assert type(closingtrade) is Trade
-        assert closingtrade.tradetype is "Close"
+        assert closingtrade.tradetype == "Close"
 
         setattr(self, "closingtrade", closingtrade)
         setattr(self, "sameday", TradeList())
@@ -75,7 +75,7 @@ class TaxCalcTradeGroup(object):
 
     def matches_as_tradelist(self):
         """
-        Returns a single tradelist with the various elements inside 
+        Returns a single tradelist with the various elements inside
         """
 
         tradelist = TradeList()
@@ -121,7 +121,7 @@ class TaxCalcTradeGroup(object):
         close_value = self.closingtrade.Value
         open_value = sum([trade.Value for trade in matchinglist])
 
-        # Taxes and commissions, always positive        
+        # Taxes and commissions, always positive
         close_tax = self.closingtrade.Tax
         close_comm = self.closingtrade.Commission
 
@@ -158,7 +158,6 @@ class TaxCalcTradeGroup(object):
                 gbp_allowable_costs = abs(open_value_gbp) + open_tax_gbp + open_comm_gbp
                 gbp_disposal_proceeds = abs(close_value_gbp) - close_tax_gbp - close_comm_gbp
 
-
             else:
                 # Selling short
                 disposal_proceeds = abs(open_value) + open_tax + open_comm
@@ -188,7 +187,7 @@ class TaxCalcTradeGroup(object):
         gbp_net_profit = gbp_disposal_proceeds - gbp_allowable_costs
 
         # We add back the positive taxes and commissions to get gross figures
-        gross_profit = net_profit + taxes + commissions
+        # gross_profit = net_profit + taxes + commissions
         gbp_gross_profit = gbp_net_profit + gbp_taxes + gbp_commissions
 
         gbp_gains = max(gbp_net_profit, 0.0)
@@ -252,18 +251,18 @@ class TaxCalcTradeGroup(object):
             """
             Example of CGT output
             1. SELL: 40867 XYZ (Stock) on 17/12/2013 at EUR0.911 gives LOSS of XYZ 8,275.00 equals GBP 5,000
-            
+
             (or CLOSE SHORT:  . Matches with OPEN SHORT: )
-            
-            Matches with: 
+
+            Matches with:
             BUY: SAME DAY TRADES.
-            TRADES WITHIN 30 days 
+            TRADES WITHIN 30 days
             SECTION 104 HOLDING. 40867 shares of XYZ bought at average price of EUR1.11333
-            
+
             """
 
             if inreport.showbrieftrade():
-                report.write("%d: %s %d %s %s on %s at %s %s each gives %s of %s %s equals GBP %s\n" % \
+                report.write("%d: %s %d %s %s on %s at %s %s each gives %s of %s %s equals GBP %s\n" %
                              (groupid, labels[1], int(abs_quantity), code, assetclass, datelabel, currency,
                               pretty(average_close_value),
                               pandl, currency, pretty(round(net_profit)), pretty(gbp_net_profit)))
@@ -276,7 +275,7 @@ class TaxCalcTradeGroup(object):
                 report.write("Trade details:" + self.closingtrade.__repr__() + "\n")
 
             if inreport.showextra():
-                report.write("Total allowable cost %s %s   Total disposal proceeds %s %s\n" % \
+                report.write("Total allowable cost %s %s   Total disposal proceeds %s %s\n" %
                              (currency, pretty(allowable_costs), currency, pretty(disposal_proceeds)))
 
                 report.write("\nMatches with:\n")
@@ -300,7 +299,8 @@ class TaxCalcTradeGroup(object):
 
                 if inreport.showextra():
                     report.write(
-                        "SAME DAY TRADE(S) Matches with %s of %d %s at average of %s %s each \n Commissions %s %s Taxes %s %s \n" % \
+                        "SAME DAY TRADE(S) Matches with %s of %d %s at average of %s %s each \n Commissions %s %s "
+                        "Taxes %s %s \n" %
                         (labels[0], sameday_quantity, code, currency, pretty(sameday_avg_value), currency,
                          pretty(sameday_comm), currency, pretty(sameday_tax)))
 
@@ -325,7 +325,8 @@ class TaxCalcTradeGroup(object):
 
                 if inreport.showextra():
                     report.write(
-                        "SUBSEQUENT %d TRADE(S) Within 30 days between %s and %s: Matches with %s of %d %s at of %s %s each \n Commissions %s %s Taxes %s %s  \n" % \
+                        "SUBSEQUENT %d TRADE(S) Within 30 days between %s and %s: Matches with %s of %d %s at of %s %s "
+                        "each \n Commissions %s %s Taxes %s %s  \n" %
                         (tradecount, str(startdate.date()), str(enddate.date()), labels[0], withinmonth_quantity, code,
                          currency, pretty(withinmonth_avg_value), currency, pretty(withinmonth_comm), currency,
                          pretty(withinmonth_tax)))
@@ -352,7 +353,8 @@ class TaxCalcTradeGroup(object):
 
                 if inreport.showextra():
                     report.write(
-                        "PRO-RATA SECTION 104: Quantity %f %s allocated from total holding of %s, made up of %d trades between %s and %s\n At average value of %s %s Commissions %s %s Taxes %s %s  \n" % \
+                        "PRO-RATA SECTION 104: Quantity %f %s allocated from total holding of %s, made up of %d trades"
+                        " between %s and %s\n At average value of %s %s Commissions %s %s Taxes %s %s  \n" %
                         (s104_quantity, code, pretty(parent_quantity), len(self.s104), str(startdate.date()),
                          str(enddate.date()), currency, pretty(s104_avg_value), currency, pretty(s104_comm), currency,
                          pretty(s104_tax)))
@@ -368,22 +370,23 @@ class TaxCalcTradeGroup(object):
         else:
             """
             Example of non CGT output
-            
+
             SELL 40867 RSA (Stock) on 17/12/2013 at EUR0.911 gives net LOSS of EUR 8,275 equals GBP5,000.0
-            AVERAGE price EUR .  Total commission: EUR   Total tax:  EUR 
+            AVERAGE price EUR .  Total commission: EUR   Total tax:  EUR
             """
             if inreport.showbrieftrade():
-                report.write("%d: %s of %d %s %s on %s at %s %s each Net %s of %s %s equals GBP %s\n" % \
-                             (groupid, labels[1], int(abs_quantity), code, assetclass, datelabel, currency,
-                              pretty(average_close_value),
-                              pandl, currency, pretty(round(net_profit)), pretty(gbp_net_profit)))
+                report.write("%d: %s of %d %s %s on %s at %s %s each Net "
+                             "%s of %s %s equals GBP %s\n" % (groupid, labels[1], int(abs_quantity), code, assetclass,
+                                                              datelabel, currency, pretty(average_close_value),
+                                                              pandl, currency, pretty(round(net_profit)),
+                                                              pretty(gbp_net_profit)))
 
             if inreport.listtrades():
                 report.write("Trade details:" + self.closingtrade.__repr__() + "\n")
 
-            tradecount = len(self.s104)
+            # tradecount = len(self.s104)
             (startdate, enddate) = self.s104.range_of_dates()
-            parent_quantity = self.s104.total_including_parents()
+            # parent_quantity = self.s104.total_including_parents()
 
             # Calculation strings, build up to show how we calculated our profit or loss
             calc_string = "%s(%d*%s) - %s - %s " % \
@@ -398,9 +401,9 @@ class TaxCalcTradeGroup(object):
 
             if inreport.showextra():
                 report.write(
-                    "\n%s at average value %s each between %s and %s.  Total round-trip commission %s %s, and taxes %s %s" % \
-                    (labels[0], pretty(average_open_value), str(startdate.date()), str(enddate.date()), currency,
-                     pretty(commissions), currency, pretty(taxes)))
+                    "\n%s at average value %s each between %s and %s.  Total round-trip commission %s %s, and taxes "
+                    "%s %s" % (labels[0], pretty(average_open_value), str(startdate.date()), str(enddate.date()),
+                               currency, pretty(commissions), currency, pretty(taxes)))
 
             if inreport.listtrades():
                 # Trade by trade breakdown

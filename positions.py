@@ -84,7 +84,7 @@ def list_breaks(dict1, dict2):
     Returns a dataframe of breaks
     """
     results = compare_position_dicts(dict1, dict2)
-    ans = results[results.Break == True]
+    ans = results[results.Break is True]
     ans.sort_values("Code")
     return ans
 

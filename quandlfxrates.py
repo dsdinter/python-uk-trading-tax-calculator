@@ -3,12 +3,12 @@ import Quandl
 
 """
     Python UK trading tax calculator
-    
+
     Copyright (C) 2015  Robert Carver
-    
-    You may copy, modify and redistribute this file as allowed in the license agreement 
+
+    You may copy, modify and redistribute this file as allowed in the license agreement
          but you must retain this header
-    
+
     See README.txt
 
 """
@@ -24,14 +24,14 @@ You can also use an authentication code if you have one
 def get_quandl_currency(currency):
     """
     Given a currency code eg USDAUD returns a pandas data frame with the quandl price series
-    
+
     Daily prices only
-    
+
     If there is no quandl price error
-    
+
     Watch out for the 100x per day limit
-    
-    
+
+
     """
 
     if currency == "GBP":
