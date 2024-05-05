@@ -1,11 +1,11 @@
 """
     Python UK trading tax calculator
-    
+
     Copyright (C) 2015  Robert Carver
-    
-    You may copy, modify and redistribute this file as allowed in the license agreement 
+
+    You may copy, modify and redistribute this file as allowed in the license agreement
          but you must retain this header
-    
+
     See README.txt
 
 """
@@ -51,7 +51,7 @@ class Trade(object):
 
     def _ready_for_split(self):
         """
-        Can this trade be split? 
+        Can this trade be split?
         """
         return self._has_preprocess_data() and self._has_allocation_data()
 
@@ -89,9 +89,9 @@ class Trade(object):
     def __init__(self, **kwargs):
 
         '''
-        Constructor 
-        
-        
+        Constructor
+
+
         '''
 
         type_and_sense_check_arguments(self, kwargs)
@@ -134,7 +134,7 @@ class Trade(object):
         if "Value" in self.argsused and raiseerror:
             raise Exception("Can't add_value on trade as Value field already set")
 
-        if not "SignQuantity" in self.argsused:
+        if "SignQuantity" not in self.argsused:
             self.add_signed_quantity()
 
         # Cash flow method. Negative means buy ...
@@ -188,7 +188,7 @@ class Trade(object):
     def _share_of_trade(self, share=None, pro_rata=None):
         """
         Returns a trade, a clones of self, with quantity share or a pro_rata proportion
-        
+
         """
 
         assert not (share is None and pro_rata is None)
@@ -223,7 +223,7 @@ class Trade(object):
     def spawn_pseudo_trades(self, tradetoclose):
         """
         Returns a new clone trade with tradetoclose, and a residual clone trade
-        
+
         """
         assert self._ready_for_split()
         assert not self.pseudotrade
@@ -260,9 +260,9 @@ class Trade(object):
         """
         Return a child order, which is a shared trade with a letter suffix, and the parent trade in attribute
            and a smaller parent order.
-           
+
         If this is an only child, then the child becomes the parent
-         
+
         """
         assert self._ready_for_split()
         assert not self.sharedtrade

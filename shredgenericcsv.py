@@ -1,3 +1,9 @@
+import numpy as np
+import datetime
+import pandas as pd
+from trades import Trade
+from tradelist import TradeList
+
 """
     Python UK trading tax calculator
 
@@ -10,36 +16,32 @@
 
 """
 
-
 """
 Import a generic csv
 
 
 """
 
-import numpy as np
-import datetime
-import pandas as pd
-from trades import Trade
-from tradelist import TradeList
 
 def _resolveBS(xstring):
-    if xstring=="B":
+    if xstring == "B":
         return "BUY"
-    elif xstring=="S":
+    elif xstring == "S":
         return "SELL"
 
-def _resolvetype(xstring):
-    if type(xstring)==np.float64 or type(xstring)==np.int64 or type(xstring)==int:
-        xstring=float(xstring)
 
-    if type(xstring)==float:
+def _resolvetype(xstring):
+    if type(xstring) == np.float64 or type(xstring) == np.int64 or type(xstring) == int:
+        xstring = float(xstring)
+
+    if type(xstring) == float:
         return xstring
 
-    if type(xstring)==str:
-        return float(xstring.replace(',',''))
+    if type(xstring) == str:
+        return float(xstring.replace(',', ''))
 
     raise Exception("Type error")
+
 
 def from_csv_row_to_trade(row, useassetclass):
     """
@@ -47,20 +49,22 @@ def from_csv_row_to_trade(row, useassetclass):
 
     Quantity is unsigned
     """
-    this_trade=Trade(Code=row.Company, Currency=row.Currency, Price=_resolvetype(row.Price),
-                     Tax=_resolvetype(row.Tax),
-                     Commission=_resolvetype(row.Charges), BS=_resolveBS(row["B/S"]),
-                     Date=datetime.datetime.strptime(row['Date'], "%d/%m/%Y"),
-                     Quantity=abs(_resolvetype(row.Shares)),
-                     AssetClass=useassetclass)
+    this_trade = Trade(Code=row.Company, Currency=row.Currency, Price=_resolvetype(row.Price),
+                       Tax=_resolvetype(row.Tax),
+                       Commission=_resolvetype(row.Charges), BS=_resolveBS(row["B/S"]),
+                       Date=datetime.datetime.strptime(row['Date'], "%d/%m/%Y"),
+                       Quantity=abs(_resolvetype(row.Shares)),
+                       AssetClass=useassetclass)
 
     return this_trade
+
 
 def _from_genericpdf_to_trades_object(all_results, useassetclass):
     """
     Converts a pandas data frame to a list of trades
     """
-    tlist=TradeList([from_csv_row_to_trade(all_results.iloc[idx], useassetclass) for idx in range(len(all_results.index))])
+    tlist = TradeList(
+        [from_csv_row_to_trade(all_results.iloc[idx], useassetclass) for idx in range(len(all_results.index))])
 
     return tlist
 
@@ -78,13 +82,12 @@ def read_generic_csv(fname, useassetclass="Stocks"):
     """
 
     ## 'Read it in
-    all_results=pd.read_csv(fname)
+    all_results = pd.read_csv(fname)
 
     ## Convert to a list of trades
-    tradelist=_from_genericpdf_to_trades_object(all_results, useassetclass)
+    tradelist = _from_genericpdf_to_trades_object(all_results, useassetclass)
 
     ## We need to add the values, and signed quantities, as these aren't included by default
-    tradelist=tradelist.add_values()
+    tradelist = tradelist.add_values()
 
     return tradelist
-

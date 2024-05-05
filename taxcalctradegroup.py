@@ -1,3 +1,8 @@
+import sys
+from trades import Trade, THRESHOLD
+from tradelist import TradeList
+from utils import tax_year, star_line, pretty
+
 """
     Python UK trading tax calculator
     
@@ -9,11 +14,6 @@
     See README.txt
 
 """
-
-import sys
-from trades import Trade, THRESHOLD
-from tradelist import TradeList
-from utils import tax_year, star_line, pretty
 
 zero_tax_tuple = (0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0, 0.0, 0.0, 0.0)
 
@@ -167,19 +167,17 @@ class TaxCalcTradeGroup(object):
                 gbp_disposal_proceeds = abs(open_value_gbp) + open_tax_gbp + open_comm_gbp
                 gbp_allowable_costs = abs(close_value_gbp) - close_tax_gbp - close_comm_gbp
 
-
         elif assetclass == "Futures" or assetclass == "Forex" or assetclass == "Equity and Index Options" or assetclass == "Warrants" or assetclass == 'CFD':
             # Futures. Disposal proceeds is local profit converted at closing FX rate
             # Allowable costs includes only commissions, taxes
 
-            #Note values are in cashflowbasis. So to work out profits we add them 
+            # Note values are in cashflowbasis. So to work out profits we add them
 
             allowable_costs = open_tax + open_comm
             disposal_proceeds = (open_value + close_value) - close_tax - close_comm
 
             gbp_allowable_costs = open_tax_gbp + open_comm_gbp
             gbp_disposal_proceeds = (open_value + close_value) * closingfxrate - close_tax_gbp - close_comm_gbp
-
 
         else:
             raise Exception(
@@ -272,7 +270,7 @@ class TaxCalcTradeGroup(object):
 
             if inreport.showextra():
                 report.write(" Commission %s %s and taxes %s %s on %s\n" % (
-                currency, pretty(close_comm), currency, pretty(close_tax), labels[1]))
+                    currency, pretty(close_comm), currency, pretty(close_tax), labels[1]))
 
             if inreport.listtrades():
                 report.write("Trade details:" + self.closingtrade.__repr__() + "\n")

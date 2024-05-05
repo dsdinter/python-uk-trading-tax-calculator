@@ -1,3 +1,6 @@
+import pandas as pd
+import Quandl
+
 """
     Python UK trading tax calculator
     
@@ -10,11 +13,7 @@
 
 """
 
-
-import pandas as pd
-import Quandl
-
-authtoken='qWXuZcdwzwQ2GJQ88sNb'
+authtoken = 'qWXuZcdwzwQ2GJQ88sNb'
 """
 Get currency data from www.quandl.com
 
@@ -34,17 +33,13 @@ def get_quandl_currency(currency):
     
     
     """
-    
-    
-    if currency=="GBP":
-        ## Return a pd of 1's from ... to present day
-        return pd.TimeSeries([1.0], index=[pd.datetime(2008,1,1)])
-     
 
-    quandldef='CURRFX/%sGBP' % currency
+    if currency == "GBP":
+        # Return a pd of 1's from ... to present day
+        return pd.TimeSeries([1.0], index=[pd.datetime(2008, 1, 1)])
+
+    quandldef = 'CURRFX/%sGBP' % currency
     data = Quandl.get(quandldef, authtoken=authtoken)
-    data=data['Rate']
-        
+    data = data['Rate']
+
     return data
-
-

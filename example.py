@@ -47,9 +47,9 @@ def get_all_trades_and_positions(trade_confirms_file, activity_report_file=None)
     transferred to IB
 
     """
-    ## trades3=read_generic_csv("tradespre2014.csv")
+    # trades3=read_generic_csv("tradespre2014.csv")
 
-    ## Doesn't inherit the type
+    # Doesn't inherit the type
     all_trades = TradeList(trades1)  # +trades2)
 
     """
@@ -66,8 +66,6 @@ def get_all_trades_and_positions(trade_confirms_file, activity_report_file=None)
     else:
         all_positions = PositionList()
 
-
-
     return (all_trades, all_positions)
 
 
@@ -82,8 +80,6 @@ if __name__ == "__main__":
     else:
         print("This program requires exactly 2 arguments.Trades Confirmation file and positions file")
         exit(1)
-
-
 
     """
     Create a big report
@@ -100,7 +96,7 @@ if __name__ == "__main__":
 
     """
 
-    ### Decide if we're calculating on a CGT or a 'true cost' basis
+    # Decide if we're calculating on a CGT or a 'true cost' basis
     CGTCalc = True
     TAX_YEAR = 2025
     REPORT_FILE = "TaxReport.txt"
@@ -113,23 +109,23 @@ if __name__ == "__main__":
                                 reportinglevel=REPORTING_LEVEL, fxsource=FX_SOURCE, fx_from_date=FX_FROM_DATE,
                                 fx_to_date=FX_TO_DATE)
 
-    ## Example of how we can delve into the finer details. This stuff is all printed to screen
-    ## You can also run this interactively
-    ## CGTCalc needs to match, or it wont' make sense
+    # Example of how we can delve into the finer details. This stuff is all printed to screen
+    # You can also run this interactively
+    # CGTCalc needs to match, or it wont' make sense
 
     taxcalc_dict.display_taxes(taxyear=TAX_YEAR, CGTCalc=CGTCalc, reportinglevel="NORMAL")
 
-    ## Display all the trades for one code ('element')
+    # Display all the trades for one code ('element')
     # taxcalc_dict['ENPH'].display_taxes_for_code(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
 
-    ## Display a particular trade. The number '3' is as shown the report
-    ##taxcalc_dict['FBTP DEC 14'].matched[3].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
+    # Display a particular trade. The number '3' is as shown the report
+    #taxcalc_dict['FBTP DEC 14'].matched[3].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
 
-    ## Heres a cool trade
+    # Heres a cool trade
     #taxcalc_dict['FGBS DEC 14'].element_display_taxes(taxyear=2015, CGTCalc=CGTCalc, reportinglevel="NORMAL")
-    ##taxcalc_dict['FGBS DEC 14'].matched[17].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
+    #taxcalc_dict['FGBS DEC 14'].matched[17].group_display_taxes(taxyear=2020, CGTCalc=CGTCalc, reportinglevel="VERBOSE")
 
-    ## Bonus feature - analyse profits
+    # Bonus feature - analyse profits
     profits = taxcalc_dict.return_profits(TAX_YEAR, CGTCalc)
     profit_analyser(profits)
 

@@ -130,8 +130,8 @@ class TradeList(list):
         dataframe = self.as_dataframe().sort_index()
         fxmat = uniquets(fxmat)
         print("names")
-        #print(dataframe.dtypes)
-        #print(fxmat.dtypes)
+        # print(dataframe.dtypes)
+        # print(fxmat.dtypes)
         fxmat.index = np.array(fxmat.index, dtype=np.datetime64)
         print(fxmat.index)
         fxmat = fxmat.reindex(dataframe.index, method="ffill")
@@ -227,8 +227,8 @@ class TradeList(list):
         # done on same day, but not in future
         # Future trades on same day will be picked up in 'within 30 days' rule
         same_day_trades = [idx for idx in range(len(listdates))
-                           if listdates[idx] == tradedate and listdatetimes[idx] < tradedatetime
-                           and not signs_match(listsignquant[idx], tradetomatch.SignQuantity)]
+                           if listdates[idx] == tradedate and listdatetimes[idx] < tradedatetime and not
+                           signs_match(listsignquant[idx], tradetomatch.SignQuantity)]
 
         if len(same_day_trades) == 0:
             return None
@@ -251,8 +251,8 @@ class TradeList(list):
         # trades are in next 30 days or today, but not in the past
         # and with opposite sign
         next_30days_trades = [idx for idx in range(len(listdates))
-                              if listdates[idx] <= tradedate30daysafter and listdatetimes[idx] > tradedatetime
-                              and not signs_match(listsignquant[idx], tradetomatch.SignQuantity)]
+                              if listdates[idx] <= tradedate30daysafter and listdatetimes[idx] > tradedatetime and not
+                              signs_match(listsignquant[idx], tradetomatch.SignQuantity)]
 
         if len(next_30days_trades) == 0:
             return None

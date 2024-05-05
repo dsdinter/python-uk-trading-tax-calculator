@@ -1,3 +1,12 @@
+import datetime
+
+import pandas as pd
+from bs4 import BeautifulSoup
+
+from trades import Trade
+from tradelist import TradeList
+from positions import Position, PositionList
+
 """
     Python UK trading tax calculator
 
@@ -30,19 +39,8 @@ TRADES_LOC and POSITIONS_LOC indicate where in the trade and activity report
 ASSETS = ['Stocks', 'Futures', 'Forex', 'CFD', 'Equity and Index Options', 'Warrants']
 CURRENCIES = ['GBP', 'JPY', 'EUR', 'KRW', 'AUD', 'CHF', 'USD', 'HKD', 'SEK', 'CAD']
 
+
 # End of formatting globals
-
-# Imports
-
-import datetime
-import sys
-
-import pandas as pd
-from bs4 import BeautifulSoup
-
-from trades import Trade
-from tradelist import TradeList
-from positions import Position, PositionList
 
 
 def _row_class(row):
@@ -71,12 +69,12 @@ def _parse_html_table(rows):
             """
             if headerrow is None:
                 # Its the first set of headers
-                #We add a column for the row class
+                # We add a column for the row class
 
                 headerlist = [str(headers.getText()) for headers in table_headers] + ['Class']
 
-                #The terms notional value and proceeds are used depending on the asset class;
-                #consistently use notional value
+                # The terms notional value and proceeds are used depending on the asset class;
+                # consistently use notional value
 
                 headerlist = ["Notional Value" if x == "Proceeds" else x for x in headerlist]
                 headerlist = ["Tax" if x == "Fee" else x for x in headerlist]
