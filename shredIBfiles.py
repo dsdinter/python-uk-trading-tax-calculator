@@ -140,7 +140,13 @@ def _check_ignore_row(row, colref="Acct ID"):
         """
         return True
 
-    if not (row['Class']=='summaryRow' or row['Class']=='row-summary' or 'row-summary' in row['Class']):        
+    if colref == 'Symbol' and row['Code'] != ['subtotal']:
+        """
+        It's not a sub total row
+        """
+        return False
+
+    if not (row['Class'] == 'summaryRow' or row['Class'] == 'row-summary' or 'row-summary' in row['Class']):
         """
         It's Granualar detail, can ignore
         """

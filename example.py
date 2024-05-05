@@ -41,7 +41,6 @@ def get_all_trades_and_positions(trade_confirms_file, activity_report_file=None)
     """
 
     trades1 = get_ib_trades(trade_confirms_file)
-    # trades2=get_ib_trades("2020_tradeconfirms.html")
 
     """
     You can also use .csv files to store trades. I'm doing that here to account for positions I
@@ -62,7 +61,7 @@ def get_all_trades_and_positions(trade_confirms_file, activity_report_file=None)
     Save as .html
     """
     if activity_report_file:
-        positions1 = get_ib_positions(activity_report_file, 7)
+        positions1 = get_ib_positions(activity_report_file, 9)
         all_positions = PositionList(positions1)
     else:
         all_positions = PositionList()
