@@ -10,12 +10,12 @@
 
 """
 
-
 import sys
 from positions import compare_trades_and_positions
 from fxrates import generate_fx_dictionary
 from taxcalcdict import TaxCalcDict
 from utils import star_line
+
 
 def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, reportinglevel="NORMAL",
                  fxsource="DATABASE", fx_from_date=None, fx_to_date=None):
@@ -41,66 +41,65 @@ def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, 
     assert reportinglevel in ["VERBOSE", "CALCULATE", "NORMAL", "BRIEF", "ANNUAL"]
 
     if reportfile is None:
-        reportfile="the screen."
-        report=sys.stdout
+        reportfile = "the screen."
+        report = sys.stdout
     else:
         report = open(reportfile, "w")
 
     print("Report will be written to %s" % reportfile)
 
-    ### Check against positions
+    # Check against positions
     if all_positions is not None:
-        breaklist=compare_trades_and_positions(all_trades, all_positions)
+        breaklist = compare_trades_and_positions(all_trades, all_positions)
         if len(breaklist) > 0:
             print("Breaks. Should be none except perhaps for FX rates.")
             print(breaklist)
         else:
             print("Trades and positions consistent")
 
-    ### Add TradeID's
+    # Add TradeID's
     all_trades.add_tradeids()
 
-    ## Get FX data
+    # Get FX data
     print("Getting fx data")
     all_currencies = all_trades.all_currencies()
     fx_dict = generate_fx_dictionary(all_currencies, fxsource, fx_from_date, fx_to_date)
 
     all_trades.add_fxdict_rates(fx_dict)
 
-
-    ## Do various preprocessing measures
+    # Do various preprocessing measures
     trade_dict_bycode = all_trades.separatecode()
     trade_dict_bycode.add_cumulative_data()
     trade_dict_bycode.generate_pseduo_trades()
 
-    ## Create a tax dictionary containing the trade data
-    taxcalc_dict=TaxCalcDict(trade_dict_bycode)
+    # Create a tax dictionary containing the trade data
+    taxcalc_dict = TaxCalcDict(trade_dict_bycode)
 
-    ## Do the trade matching
+    # Do the trade matching
     print("Matching trades")
     taxcalc_dict.allocate_dict_trades(CGTCalc)
 
-    ## Consistency check - this should never fail
-    breaklist=compare_trades_and_positions(all_trades, taxcalc_dict.umatched_as_positions())
+    # Consistency check - this should never fail
+    breaklist = compare_trades_and_positions(all_trades, taxcalc_dict.umatched_as_positions())
 
-    if len(breaklist)>0:
+    if len(breaklist) > 0:
         print("BREAKS between final positions and those implied by trades. Something gone horribly wrong!")
         print(breaklist)
         raise Exception("Breaks occured!")
     else:
         print("Passed consistency check")
 
-    ## What tax years are our trades for
-    taxyears=taxcalc_dict.tax_year_span()
+    # What tax years are our trades for
+    taxyears = taxcalc_dict.tax_year_span()
 
     for taxyear in taxyears:
         report.write(star_line())
         report.write("\n TAX YEAR: %d \n\n" % taxyear)
 
-        ## Display taxes
+        # Display taxes
         taxcalc_dict.display_taxes(taxyear, CGTCalc, reportinglevel, report)
 
-    if reportfile is not "the screen":
+    if reportfile != "the screen":
         report.close()
 
     print("Report finished")

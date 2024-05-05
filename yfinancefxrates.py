@@ -10,7 +10,6 @@
 """
 import yfinance as yf
 import pandas as pd
-import datetime
 
 
 def get_prices_history(tickers, from_date, to_date, columns=['Close']):
@@ -45,6 +44,6 @@ def get_yfinance_fx_rates(currency, from_date, to_date):
         data = get_prices_history(["GBP" + currency + "=X"], from_date, to_date)
         # prices.Close = prices.Close.dt.tz_localize('UTC').dt.tz_convert('Europe/London', errors='coerce')
 
-    #print("FX Rates GBP to : " + currency)
-    #print(data)
+    # print("FX Rates GBP to : " + currency)
+    # print(data)
     return data

@@ -13,10 +13,11 @@
 import numpy as np
 import sys
 from tradelist import TradeList, TradeDictByCode
-from utils import  which_tax_year, star_line,pretty
+from utils import which_tax_year, star_line, pretty
 
 from taxcalctradegroup import TaxCalcTradeGroup, zero_tax_tuple
 from positions import Position, PositionList
+
 
 class TaxCalcDict(dict):
     """
@@ -29,16 +30,14 @@ class TaxCalcDict(dict):
            TaxCalcElement()
     """
 
-
     def __init__(self, tradedict):
-
-        '''
+        """
         To set up the group we loop over the elements in the trade dict
-        '''
+        """
         assert type(tradedict) is TradeDictByCode
 
         for code in list(tradedict.keys()):
-            self[code]=TaxCalcElement(tradedict[code])
+            self[code] = TaxCalcElement(tradedict[code])
 
     def allocate_dict_trades(self, CGTcalc=True):
 
@@ -46,43 +45,41 @@ class TaxCalcDict(dict):
 
         return self
 
-
     def return_profits(self, taxyear, CGTCalc):
 
-        codes= list(self.keys())
+        codes = list(self.keys())
         codes.sort()
-        elements_profits=dict([(code,self[code].return_profits_for_code(taxyear, CGTCalc)) for code in codes])
+        elements_profits = dict([(code, self[code].return_profits_for_code(taxyear, CGTCalc)) for code in codes])
 
         return elements_profits
 
     def average_commission(self, taxyear):
-        codes= list(self.keys())
+        codes = list(self.keys())
         codes.sort()
-        average_commissions=dict([(code,self[code].average_commission(taxyear)) for code in codes])
+        average_commissions = dict([(code, self[code].average_commission(taxyear)) for code in codes])
 
         return average_commissions
 
-
-
-    def display_taxes(self,  taxyear, CGTCalc, reportinglevel, report=None):
+    def display_taxes(self, taxyear, CGTCalc, reportinglevel, report=None):
         """
         Run through each element, displaying the tax information in full
 
         Then print a summary
         """
-        assert reportinglevel in ["VERBOSE","CALCULATE", "NORMAL", "BRIEF", "ANNUAL"]
+        assert reportinglevel in ["VERBOSE", "CALCULATE", "NORMAL", "BRIEF", "ANNUAL"]
 
         if report is None:
-            report=sys.stdout
+            report = sys.stdout
 
-        ## Prints, and returns a tuple for each disposal_proceeds, allowable_costs, year_gains, year_losses,
-        ##        number_disposals, commissions, taxes, gross profit, net profit
+        # Prints, and returns a tuple for each disposal_proceeds, allowable_costs, year_gains, year_losses,
+        #        number_disposals, commissions, taxes, gross profit, net profit
 
-        codes= list(self.keys())
+        codes = list(self.keys())
         codes.sort()
-        elements_taxdata=[self[code].display_taxes_for_code(taxyear, CGTCalc, reportinglevel, report) for code in codes]
+        elements_taxdata = [self[code].display_taxes_for_code(taxyear, CGTCalc, reportinglevel, report) for code in
+                            codes]
 
-        if len(elements_taxdata)==0:
+        if len(elements_taxdata) == 0:
             report.write(star_line())
 
             report.write("\n\nNo relevant trades for tax year %d\n\n" % taxyear)
@@ -90,26 +87,24 @@ class TaxCalcDict(dict):
 
             return None
 
+        summary_taxdata = list(map(sum, list(zip(*elements_taxdata))))
 
-        summary_taxdata=list(map(sum, list(zip(*elements_taxdata))))
+        assert len(summary_taxdata) == len(zero_tax_tuple)
 
-        assert len(summary_taxdata)==len(zero_tax_tuple)
-
-        ## print the summary (always regardless of reporting level)
+        # print the summary (always regardless of reporting level)
         display_summary_tax(summary_taxdata, CGTCalc, taxyear, report)
 
         report.write(star_line())
 
-
         return None
 
     def tax_year_span(self):
-        ## Get unique list of tax years
-        datelist=[]
+        # Get unique list of tax years
+        datelist = []
         for taxelement in list(self.values()):
-            datelist=datelist+taxelement.closing_trade_dates()
-        taxyears=[which_tax_year(datex) for datex in datelist]
-        taxyears=list(set(taxyears))
+            datelist = datelist + taxelement.closing_trade_dates()
+        taxyears = [which_tax_year(datex) for datex in datelist]
+        taxyears = list(set(taxyears))
         taxyears.sort()
 
         return taxyears
@@ -118,10 +113,10 @@ class TaxCalcDict(dict):
         """
         Return a PositionList object containing the unmatched trades
         """
-        result=PositionList()
+        result = PositionList()
 
         for code in list(self.keys()):
-            position=self[code].unmatched.final_position()
+            position = self[code].unmatched.final_position()
             result.append(Position(Code=code, Position=position))
 
         return result
@@ -140,7 +135,6 @@ class TaxCalcElement(object):
             unmatched: TradeList of all unmatched trades. Initially this inherits all the trades in tradelist
     """
 
-
     def __init__(self, tradelist):
 
         '''
@@ -152,22 +146,20 @@ class TaxCalcElement(object):
         setattr(self, "matched", dict())
         setattr(self, "unmatched", tradelist)
 
-
     def __repr__(self):
 
         return "%s %d matched, %d unmatched" % (self.code(), len(self.matched), len(self.unmatched))
 
     def code(self):
-        if len(self.matched)>0:
+        if len(self.matched) > 0:
             return list(self.matched.values())[0].closingtrade.Code
-        elif len(self.unmatched)>0:
+        elif len(self.unmatched) > 0:
             return self.unmatched[0].Code
         else:
             return ""
 
-
     def closing_trade_dates(self):
-        datelist=[taxcalcgroup.closingtrade.Date for taxcalcgroup in list(self.matched.values())]
+        datelist = [taxcalcgroup.closingtrade.Date for taxcalcgroup in list(self.matched.values())]
 
         return datelist
 
@@ -179,59 +171,55 @@ class TaxCalcElement(object):
         Then match them
         """
 
-        ## Find, and pop,  next closing trade in unmatched list
-        ## This will be none if there aren't any
-        ## Then add to tax calc trade group
+        # Find, and pop,  next closing trade in unmatched list
+        # This will be none if there aren't any
+        # Then add to tax calc trade group
 
-        tradecount=1
+        tradecount = 1
 
         while True:
-            earliest_closing_trade=self.unmatched._pop_earliest_closing_trade()
+            earliest_closing_trade = self.unmatched._pop_earliest_closing_trade()
 
             if earliest_closing_trade is None:
                 break
 
-            ## Now create the matched group. This will pop things out of self.allocated
-            taxcalcgroup=self.matchingforgroup(earliest_closing_trade, CGTcalc)
+            # Now create the matched group. This will pop things out of self.allocated
+            taxcalcgroup = self.matchingforgroup(earliest_closing_trade, CGTcalc)
 
-            self.matched[tradecount]=taxcalcgroup
+            self.matched[tradecount] = taxcalcgroup
 
-            tradecount=tradecount+1
+            tradecount = tradecount + 1
 
-        if len(self.unmatched)>0:
+        if len(self.unmatched) > 0:
 
-            if self.unmatched.final_position()==0:
+            if self.unmatched.final_position() == 0:
 
-                ## Now we've got rid of the closing trades, we're probably left with a bunch of opening trades
+                # Now we've got rid of the closing trades, we're probably left with a bunch of opening trades
 
-                ## The last one of these must be a closer with a different sign, pretending to be
-                ##  an opener
+                # The last one of these must be a closer with a different sign, pretending to be
+                #  an opener
 
-                while len(self.unmatched)>0:
+                while len(self.unmatched) > 0:
+                    # Make it into a closer, and then run a match
 
-                    ## Make it into a closer, and then run a match
-
-                    ## get the last trade
+                    # get the last trade
                     self.unmatched.date_sort()
 
-                    tradetomatch=self.unmatched.pop()
+                    tradetomatch = self.unmatched.pop()
                     tradetomatch.modify(tradetype="Close")
 
+                    taxcalcgroup = self.matchingforgroup(tradetomatch, CGTcalc)
+                    self.matched[tradecount] = taxcalcgroup
 
-                    taxcalcgroup=self.matchingforgroup(tradetomatch, CGTcalc)
-                    self.matched[tradecount]=taxcalcgroup
+                    tradecount = tradecount + 1
 
-                    tradecount=tradecount+1
-
-                assert len(self.unmatched)==0
+                assert len(self.unmatched) == 0
 
             else:
-                ## We've got positions remaining, which is fine
+                # We've got positions remaining, which is fine
                 pass
 
-
         return self
-
 
     def matchingforgroup(self, tradetomatch, CGTcalc):
         """
@@ -241,150 +229,147 @@ class TaxCalcElement(object):
 
         """
 
-        ## Create the group initially with just
-        taxcalcgroup=TaxCalcTradeGroup(tradetomatch)
+        # Create the group initially with just
+        taxcalcgroup = TaxCalcTradeGroup(tradetomatch)
 
         if CGTcalc:
 
-            ## Same day
+            # Same day
             while taxcalcgroup.is_unmatched():
 
-                tradeidx=self.unmatched.idx_of_last_trade_same_day(tradetomatch)
+                tradeidx = self.unmatched.idx_of_last_trade_same_day(tradetomatch)
                 if tradeidx is None:
                     break
 
-                ## Remove the trade (creating a partial if needed)
-                poppedtrade=self.unmatched._partial_pop_idx(tradeidx, taxcalcgroup.count_unmatched())
+                # Remove the trade (creating a partial if needed)
+                poppedtrade = self.unmatched._partial_pop_idx(tradeidx, taxcalcgroup.count_unmatched())
 
-                ## Add to list
+                # Add to list
                 taxcalcgroup.sameday.append(poppedtrade)
 
-            ## 30 day rule
+            # 30 day rule
             while taxcalcgroup.is_unmatched():
 
-                tradeidx=self.unmatched.idx_of_first_trade_next_30days(tradetomatch)
+                tradeidx = self.unmatched.idx_of_first_trade_next_30days(tradetomatch)
                 if tradeidx is None:
                     break
 
-                ## Remove the trade (creating a partial if needed)
-                poppedtrade=self.unmatched._partial_pop_idx(tradeidx, taxcalcgroup.count_unmatched())
+                # Remove the trade (creating a partial if needed)
+                poppedtrade = self.unmatched._partial_pop_idx(tradeidx, taxcalcgroup.count_unmatched())
 
-                ## Add to list
+                # Add to list
                 taxcalcgroup.withinmonth.append(poppedtrade)
 
-
-        ## S104 (what we do without CGT calc, or what's left
-        ## This is a bit more complicated because we need to do a
-        ##            proportionate partial pop of all previous trades
+        # S104 (what we do without CGT calc, or what's left
+        # This is a bit more complicated because we need to do a
+        #            proportionate partial pop of all previous trades
 
         if taxcalcgroup.is_unmatched():
 
-            ## Get all the previous trades
-            tradeidxlist=self.unmatched.idx_of_trades_before_datetime(tradetomatch)
+            # Get all the previous trades
+            tradeidxlist = self.unmatched.idx_of_trades_before_datetime(tradetomatch)
 
-            if len(tradeidxlist)>0:
+            if len(tradeidxlist) > 0:
+                # Remove a proportion of all previous trades
+                popped_trades = self.unmatched._proportionate_pop_idx(tradeidxlist, taxcalcgroup.count_unmatched())
 
-                ## Remove a proportion of all previous trades
-                popped_trades=self.unmatched._proportionate_pop_idx(tradeidxlist, taxcalcgroup.count_unmatched())
-
-                ## Add to list
-                taxcalcgroup.s104=popped_trades
-
+                # Add to list
+                taxcalcgroup.s104 = popped_trades
 
         if taxcalcgroup.is_unmatched():
             print("Can't find a match for %d lots of ...:" % taxcalcgroup.count_unmatched())
             print(taxcalcgroup.closingtrade)
             raise Exception()
 
-
         return taxcalcgroup
 
-
     def return_profits_for_code(self, taxyear, CGTCalc):
-        ## Returns a list of profits
-        groupidlist=list(self.matched.keys())
+        # Returns a list of profits
+        groupidlist = list(self.matched.keys())
         groupidlist.sort()
 
-        ## Last is always net p&l
-        taxdata=[self.matched[groupid].group_display_taxes(taxyear, CGTCalc, reportinglevel="", groupid=groupid, report=None, display=False)[-1] \
-                 for groupid in groupidlist]
+        # Last is always net p&l
+        taxdata = [
+            self.matched[groupid].group_display_taxes(taxyear, CGTCalc, reportinglevel="", groupid=groupid, report=None,
+                                                      display=False)[-1] for groupid in groupidlist]
 
         return taxdata
 
     def display_taxes_for_code(self, taxyear, CGTCalc, reportinglevel, report=None):
-        ## Prints, and returns a tuple for each disposal_proceeds, allowable_costs, year_gains, year_losses,
-        ##        number_disposals, commissions, taxes, gross profit, net profit
+        # Prints, and returns a tuple for each disposal_proceeds, allowable_costs, year_gains, year_losses,
+        #        number_disposals, commissions, taxes, gross profit, net profit
 
-        groupidlist=list(self.matched.keys())
+        groupidlist = list(self.matched.keys())
         groupidlist.sort()
 
-        taxdata=[self.matched[groupid].group_display_taxes(taxyear, CGTCalc, reportinglevel, groupid, report) for groupid in groupidlist]
-        if len(taxdata)==0:
+        taxdata = [self.matched[groupid].group_display_taxes(taxyear, CGTCalc, reportinglevel, groupid, report) for
+                   groupid in groupidlist]
+        if len(taxdata) == 0:
             return zero_tax_tuple
 
-        ## Sum up the tuple, and return the sums
-        sum_taxdata=list(map(sum, list(zip(*taxdata))))
+        # Sum up the tuple, and return the sums
+        sum_taxdata = list(map(sum, list(zip(*taxdata))))
 
-        assert len(sum_taxdata)==len(zero_tax_tuple)
+        assert len(sum_taxdata) == len(zero_tax_tuple)
 
         return sum_taxdata
 
     def average_commission(self, taxyear):
-        ## Returns the average commission
-        groupidlist=list(self.matched.keys())
+        # Returns the average commission
+        groupidlist = list(self.matched.keys())
         groupidlist.sort()
 
-        ## Last is always net p&l
-        taxdata=[self.matched[groupid].group_display_taxes(taxyear, CGTCalc=True, reportinglevel="", groupid=groupid, report=None, display=False) \
-                 for groupid in groupidlist]
+        # Last is always net p&l
+        taxdata = [self.matched[groupid].group_display_taxes(taxyear, CGTCalc=True, reportinglevel="", groupid=groupid,
+                                                             report=None, display=False) \
+                   for groupid in groupidlist]
 
-        commissions=[x[5] for x in taxdata]
-        quants=[x[8] for x in taxdata]
+        commissions = [x[5] for x in taxdata]
+        quants = [x[8] for x in taxdata]
 
-        total_comm=sum(commissions)
-        total_quant=sum(quants)
+        total_comm = sum(commissions)
+        total_quant = sum(quants)
 
-        if total_quant==0.0:
-            if total_comm==0:
+        if total_quant == 0.0:
+            if total_comm == 0:
                 return np.nan
             else:
                 return 0.0
 
-        return total_comm / (2.0*total_quant)
+        return total_comm / (2.0 * total_quant)
+
 
 def display_summary_tax(summary_taxdata, CGTCalc, taxyear, report):
-
-        """
+    """
         taxdata contains a list of tuples
-        ## Each tuplue (gbp_disposal_proceeds, gbp_allowable_costs, gbp_gains, gbp_losses, number_disposals,
+        # Each tuplue (gbp_disposal_proceeds, gbp_allowable_costs, gbp_gains, gbp_losses, number_disposals,
                 commissions, taxes, gbp_gross_profit, gbp_net_profit)
 
 
 
         """
 
-        ## Unpack tuple
-        (gbp_disposal_proceeds, gbp_allowable_costs, gbp_gains, gbp_losses, number_disposals,
-                gbp_commissions, gbp_taxes, gbp_gross_profit,  abs_quantity, gbp_net_profit) = summary_taxdata
+    # Unpack tuple
+    (gbp_disposal_proceeds, gbp_allowable_costs, gbp_gains, gbp_losses, number_disposals,
+     gbp_commissions, gbp_taxes, gbp_gross_profit, abs_quantity, gbp_net_profit) = summary_taxdata
 
-        report.write(star_line())
+    report.write(star_line())
 
-        report.write("\n\n                Summary for tax year ending 5th April %d \n" % taxyear)
-        report.write("\n                              Figures in GBP\n\n")
+    report.write("\n\n                Summary for tax year ending 5th April %d \n" % taxyear)
+    report.write("\n                              Figures in GBP\n\n")
 
+    if CGTCalc:
+        report.write(
+            "Disposal Proceeds = %s, Allowable Costs = %s, Disposals = %d \n Year Gains = %s  Year Losses = %s PROFIT = %s\n" % \
+            (pretty(gbp_disposal_proceeds), pretty(gbp_allowable_costs),
+             number_disposals, pretty(gbp_gains), pretty(gbp_losses), pretty(gbp_net_profit)))
 
-        if CGTCalc:
-            report.write("Disposal Proceeds = %s, Allowable Costs = %s, Disposals = %d \n Year Gains = %s  Year Losses = %s PROFIT = %s\n" % \
-                (pretty(gbp_disposal_proceeds), pretty(gbp_allowable_costs),
-                 number_disposals, pretty(gbp_gains), pretty(gbp_losses), pretty(gbp_net_profit)))
+    else:
+        report.write("Gross trading profit %s, Commission paid %s, Taxes paid %s, Net profit %s\n" % \
+                     (pretty(gbp_gross_profit), pretty(gbp_commissions),
+                      pretty(gbp_taxes), pretty(gbp_net_profit)))
 
-        else:
-            report.write("Gross trading profit %s, Commission paid %s, Taxes paid %s, Net profit %s\n" % \
-              (pretty(gbp_gross_profit), pretty(gbp_commissions),
-               pretty(gbp_taxes), pretty(gbp_net_profit)))
+        report.write(
+            "\nNot included: interest paid, interest received, data and other fees, internet connection,...\n hardware, software, books, subscriptions, office space, Dividend income (report seperately)\n\n")
 
-            report.write("\nNot included: interest paid, interest received, data and other fees, internet connection,...\n hardware, software, books, subscriptions, office space, Dividend income (report seperately)\n\n")
-
-        report.write("\n\n")
-
-
+    report.write("\n\n")
