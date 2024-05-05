@@ -136,13 +136,13 @@ def _check_ignore_row(row, colref="Acct ID"):
     """
     if "Total" in row[colref]:
         """
-        It's a sub total row
+        It's a sub total row in trades file
         """
         return True
 
     if colref == 'Symbol' and row['Code'] != ['subtotal']:
         """
-        It's not a sub total row
+        It's not a sub total row in positions file
         """
         return False
 
