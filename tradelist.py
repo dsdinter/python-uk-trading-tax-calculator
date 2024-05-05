@@ -11,6 +11,7 @@
 """
 
 import datetime
+from collections import defaultdict
 from copy import copy
 import numpy as np
 
@@ -26,6 +27,15 @@ class TradeList(list):
 
 
     '''
+
+    def as_dict(self):
+        ans = defaultdict(list)
+        for x in self:
+            ans[x.Code].append(x.Quantity)
+        # Sum the positions per key
+        for key in ans:
+            ans[key] = sum(ans[key])
+        return ans
 
     def separatecode(self):
         """

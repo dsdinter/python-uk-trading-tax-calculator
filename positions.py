@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import pandas as pd
 from utils import type_and_sense_check_arguments
 from trades import THRESHOLD
@@ -75,7 +77,12 @@ class PositionList(list):
     """
 
     def as_dict(self):
-        ans = dict([(x.Code, x.Position) for x in self])
+        ans = defaultdict(list)
+        for x in self:
+            ans[x.Code].append(x.Position)
+        # Sum the positions per key
+        for key in ans:
+            ans[key] = sum(ans[key])
         return ans
 
 
@@ -84,14 +91,16 @@ def list_breaks(dict1, dict2):
     Returns a dataframe of breaks
     """
     results = compare_position_dicts(dict1, dict2)
-    ans = results[results.Break is True]
+    ans = results[results.Break]
     ans.sort_values("Code")
     return ans
 
 
 def not_matching_position(x, y):
     if abs(x - y) > THRESHOLD:
-        return False
+        return True
+
+    return False
 
 
 def compare_position_dicts(dict1, dict2):
