@@ -139,10 +139,8 @@ class TradeList(list):
 
         dataframe = self.as_dataframe().sort_index()
         fxmat = uniquets(fxmat)
-        print("names")
-        # print(dataframe.dtypes)
-        # print(fxmat.dtypes)
-        fxmat.index = np.array(fxmat.index, dtype=np.datetime64)
+        print("FX Days")
+        fxmat.index = np.array(fxmat.index, dtype=np.datetime64(1, 'D'))
         print(fxmat.index)
         fxmat = fxmat.reindex(dataframe.index, method="ffill")
         [self[idx].modify(FXRate=float(fxmat.iloc[idx])) for idx in range(len(self))]

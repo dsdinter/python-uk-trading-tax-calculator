@@ -131,7 +131,11 @@ if __name__ == "__main__":
     avgcomm = taxcalc_dict.average_commission(TAX_YEAR)
     codes = list(avgcomm.keys())
     codes.sort()
+    print("####################")
+    print("Commission per trade")
     for code in codes:
         print("%s %f" % (code, avgcomm[code]))
 
+    print("##################")
+    print("Average commission")
     print(np.nanmean(list(avgcomm.values())))

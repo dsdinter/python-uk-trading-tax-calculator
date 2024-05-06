@@ -52,7 +52,7 @@ def calculatetax(all_trades, all_positions=None, CGTCalc=True, reportfile=None, 
     if all_positions is not None:
         breaklist = compare_trades_and_positions(all_trades, all_positions)
         if len(breaklist) > 0:
-            print("Breaks. Should be none except perhaps for FX rates.")
+            print("Breaks. Should be none except perhaps for FX rates or open positions.")
             print(breaklist)
         else:
             print("Trades and positions consistent")
