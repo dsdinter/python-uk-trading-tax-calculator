@@ -101,8 +101,8 @@ if __name__ == "__main__":
     REPORT_FILE = "TaxReport.txt"
     REPORTING_LEVEL = "VERBOSE"
     FX_SOURCE = "YFINANCE"
-    FX_FROM_DATE = "2024-01-30"
-    FX_TO_DATE = "2024-05-04"
+    FX_FROM_DATE = all_trades[0].Date.strftime("%Y-%m-%d")
+    FX_TO_DATE = all_trades[-1].Date.strftime("%Y-%m-%d")
 
     taxcalc_dict = calculatetax(all_trades, all_positions, CGTCalc=CGTCalc, reportfile=REPORT_FILE,
                                 reportinglevel=REPORTING_LEVEL, fxsource=FX_SOURCE, fx_from_date=FX_FROM_DATE,
