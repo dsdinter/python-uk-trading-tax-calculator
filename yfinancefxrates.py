@@ -41,7 +41,7 @@ def get_yfinance_fx_rates(currency, from_date, to_date):
         d_range = pd.date_range(from_date, to_date)
         data = pd.Series(1.0, index=d_range)
     else:
-        data = get_prices_history(["GBP" + currency + "=X"], from_date, to_date)
+        data = get_prices_history([currency + "GBP" + "=X"], from_date, to_date)
         # prices.Close = prices.Close.dt.tz_localize('UTC').dt.tz_convert('Europe/London', errors='coerce')
 
     # print("FX Rates GBP to : " + currency)
