@@ -101,8 +101,10 @@ if __name__ == "__main__":
     REPORT_FILE = "TaxReport.txt"
     REPORTING_LEVEL = "VERBOSE"
     FX_SOURCE = "YFINANCE"
-    FX_FROM_DATE = all_trades[0].Date.strftime("%Y-%m-%d")
-    FX_TO_DATE = all_trades[-1].Date.strftime("%Y-%m-%d")
+    fx_dates = [x.Date for x in all_trades]
+    FX_FROM_DATE = min(fx_dates).strftime("%Y-%m-%d")
+    FX_TO_DATE = max(fx_dates).strftime("%Y-%m-%d")
+    print("FX data from %s to %s" % (FX_FROM_DATE, FX_TO_DATE))
 
     taxcalc_dict = calculatetax(all_trades, all_positions, CGTCalc=CGTCalc, reportfile=REPORT_FILE,
                                 reportinglevel=REPORTING_LEVEL, fxsource=FX_SOURCE, fx_from_date=FX_FROM_DATE,

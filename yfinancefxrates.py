@@ -26,6 +26,7 @@ def get_prices_history(tickers, from_date, to_date, columns=['Close']):
             prices = pd.concat([prices, ticker_prices], axis=1)
         else:
             print(f"{ticker} has no data!")
+            exit(1)
     return prices
 
 
@@ -42,8 +43,7 @@ def get_yfinance_fx_rates(currency, from_date, to_date):
         data = pd.Series(1.0, index=d_range)
     else:
         data = get_prices_history([currency + "GBP" + "=X"], from_date, to_date)
-        # prices.Close = prices.Close.dt.tz_localize('UTC').dt.tz_convert('Europe/London', errors='coerce')
-
-    # print("FX Rates GBP to : " + currency)
-    # print(data)
+        data.Close = data.Close.dt.tz_localize('UTC').dt.tz_convert('Europe/London', errors='coerce')
+    print("FX Rates GBP to : " + currency)
+    print(data)
     return data
